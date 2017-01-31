@@ -101,10 +101,12 @@ mark_as_advanced (HDF5_USE_FOLDERS)
 if (HDF5_USE_FOLDERS)
   set_property (GLOBAL PROPERTY USE_FOLDERS ON)
 endif (HDF5_USE_FOLDERS)
-option (HDF5_NO_PACKAGES "CPACK - Disable packaging" OFF)
+option (HDF5_NO_PACKAGES "CPACK - Disable packaging" ON)
 mark_as_advanced (HDF5_NO_PACKAGES)
 option (ALLOW_UNSUPPORTED "Allow unsupported combinations of configure options" OFF)
 mark_as_advanced (ALLOW_UNSUPPORTED)
+
+set(HDF5_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 #-----------------------------------------------------------------------------
 # Set the core names of all the libraries
@@ -473,7 +475,7 @@ endif (HDF5_BUILD_FRAMEWORKS AND NOT BUILD_SHARED_LIBS)
 #-----------------------------------------------------------------------------
 # Option to Build Shared and Static libs, default is static
 #-----------------------------------------------------------------------------
-option (BUILD_SHARED_LIBS "Build Shared Libraries" ON)
+option (BUILD_SHARED_LIBS "Build Shared Libraries" OFF)
 set (H5_ENABLE_SHARED_LIB NO)
 if (BUILD_SHARED_LIBS)
   set (H5_ENABLE_SHARED_LIB YES)
@@ -766,7 +768,7 @@ endif (HDF5_ALLOW_EXTERNAL_SUPPORT MATCHES "SVN" OR HDF5_ALLOW_EXTERNAL_SUPPORT 
 #-----------------------------------------------------------------------------
 # Dashboard and Testing Settings
 #-----------------------------------------------------------------------------
-option (BUILD_TESTING "Build HDF5 Unit Testing" ON)
+option (BUILD_TESTING "Build HDF5 Unit Testing" OFF)
 if (BUILD_TESTING)
   set (DART_TESTING_TIMEOUT 1200
       CACHE INTEGER
@@ -791,12 +793,12 @@ if (BUILD_TESTING)
 
   if (NOT HDF5_EXTERNALLY_CONFIGURED)
     if (EXISTS "${HDF5_SOURCE_DIR}/test" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/test")
-      add_subdirectory (${HDF5_SOURCE_DIR}/tools/lib ${PROJECT_BINARY_DIR}/tools/lib)
-      add_subdirectory (${HDF5_SOURCE_DIR}/test      ${PROJECT_BINARY_DIR}/test)
+      #add_subdirectory (${HDF5_SOURCE_DIR}/tools/lib ${PROJECT_BINARY_DIR}/tools/lib)
+      #add_subdirectory (${HDF5_SOURCE_DIR}/test      ${PROJECT_BINARY_DIR}/test)
     endif (EXISTS "${HDF5_SOURCE_DIR}/test" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/test")
     if (H5_HAVE_PARALLEL)
       if (EXISTS "${HDF5_SOURCE_DIR}/testpar" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/testpar")
-        add_subdirectory (${HDF5_SOURCE_DIR}/testpar ${PROJECT_BINARY_DIR}/testpar)
+        #add_subdirectory (${HDF5_SOURCE_DIR}/testpar ${PROJECT_BINARY_DIR}/testpar)
       endif (EXISTS "${HDF5_SOURCE_DIR}/testpar" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/testpar")
     endif (H5_HAVE_PARALLEL)
   endif (NOT HDF5_EXTERNALLY_CONFIGURED)
@@ -806,7 +808,7 @@ endif (BUILD_TESTING)
 # Option to build HDF5 Tools
 #-----------------------------------------------------------------------------
 if (EXISTS "${HDF5_SOURCE_DIR}/tools" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/tools")
-  option (HDF5_BUILD_TOOLS  "Build HDF5 Tools" ON)
+  option (HDF5_BUILD_TOOLS  "Build HDF5 Tools" OFF)
   if (HDF5_BUILD_TOOLS)
     add_subdirectory (${HDF5_SOURCE_DIR}/tools ${PROJECT_BINARY_DIR}/tools)
   endif (HDF5_BUILD_TOOLS)
@@ -816,7 +818,7 @@ endif (EXISTS "${HDF5_SOURCE_DIR}/tools" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/to
 # Option to build examples
 #-----------------------------------------------------------------------------
 if (EXISTS "${HDF5_SOURCE_DIR}/examples" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/examples")
-  option (HDF5_BUILD_EXAMPLES  "Build HDF5 Library Examples" ON)
+  option (HDF5_BUILD_EXAMPLES  "Build HDF5 Library Examples" OFF)
   if (HDF5_BUILD_EXAMPLES)
     add_subdirectory (${HDF5_SOURCE_DIR}/examples ${PROJECT_BINARY_DIR}/examples)
   endif (HDF5_BUILD_EXAMPLES)
@@ -877,11 +879,11 @@ if (EXISTS "${HDF5_SOURCE_DIR}/fortran" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/for
     #
 #    set (FCFLAGS "${Fortran_DEFINES}")
 
-    add_subdirectory (${HDF5_SOURCE_DIR}/fortran ${PROJECT_BINARY_DIR}/fortran)
+    #add_subdirectory (${HDF5_SOURCE_DIR}/fortran ${PROJECT_BINARY_DIR}/fortran)
     if (HDF5_BUILD_HL_LIB)
       if (EXISTS "${HDF5_SOURCE_DIR}/hl/fortran" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/hl/fortran")
         #-- Build the High Level Fortran source codes
-        add_subdirectory (${HDF5_SOURCE_DIR}/hl/fortran ${PROJECT_BINARY_DIR}/hl/fortran)
+        #add_subdirectory (${HDF5_SOURCE_DIR}/hl/fortran ${PROJECT_BINARY_DIR}/hl/fortran)
       endif (EXISTS "${HDF5_SOURCE_DIR}/hl/fortran" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/hl/fortran")
     endif (HDF5_BUILD_HL_LIB)
   endif (HDF5_BUILD_FORTRAN)
@@ -891,7 +893,7 @@ endif (EXISTS "${HDF5_SOURCE_DIR}/fortran" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/
 # Option to build HDF5 C++ Library
 #-----------------------------------------------------------------------------
 if (EXISTS "${HDF5_SOURCE_DIR}/c++" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/c++")
-  option (HDF5_BUILD_CPP_LIB  "Build HDF5 C++ Library" ON)
+  option (HDF5_BUILD_CPP_LIB  "Build HDF5 C++ Library" OFF)
   if (HDF5_BUILD_CPP_LIB)
     # check for unsupported options
     if (HDF5_ENABLE_PARALLEL)
@@ -930,7 +932,7 @@ endif (HDF5_BUILD_FORTRAN AND HDF5_BUILD_HL_LIB)
 if (EXISTS "${HDF5_SOURCE_DIR}/java" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/java")
   option (HDF5_BUILD_JAVA  "Build Java HDF5 Library" OFF)
   if (HDF5_BUILD_JAVA)
-    add_subdirectory (${HDF5_SOURCE_DIR}/java ${PROJECT_BINARY_DIR}/java)
+    #add_subdirectory (${HDF5_SOURCE_DIR}/java ${PROJECT_BINARY_DIR}/java)
   endif (HDF5_BUILD_JAVA)
 endif (EXISTS "${HDF5_SOURCE_DIR}/java" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/java")
 

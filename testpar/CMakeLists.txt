@@ -31,14 +31,14 @@ add_executable (testphdf5 ${testphdf5_SRCS})
 TARGET_NAMING (testphdf5 STATIC)
 TARGET_C_PROPERTIES (testphdf5 STATIC " " " ")
 target_link_libraries (testphdf5 ${HDF5_TEST_LIB_TARGET} ${HDF5_LIB_TARGET} ${LINK_LIBS})
-set_target_properties (testphdf5 PROPERTIES FOLDER test/par)
+set_target_properties (testphdf5 PROPERTIES FOLDER External/hdf5)
 
 MACRO (ADD_H5P_EXE file)
   add_executable (${file} ${HDF5_TEST_PAR_SOURCE_DIR}/${file}.c)
   TARGET_NAMING (${file} STATIC)
   TARGET_C_PROPERTIES (${file} STATIC " " " ")
   target_link_libraries (${file} ${HDF5_TEST_LIB_TARGET} ${HDF5_LIB_TARGET} ${LINK_LIBS})
-  set_target_properties (${file} PROPERTIES FOLDER test/par)
+  set_target_properties (${file} PROPERTIES FOLDER External/hdf5)
 ENDMACRO (ADD_H5P_EXE file)
 
 set (H5P_TESTS

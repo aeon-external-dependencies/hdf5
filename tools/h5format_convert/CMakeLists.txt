@@ -13,7 +13,7 @@ add_executable (h5format_convert ${HDF5_TOOLS_H5FC_SOURCE_DIR}/h5format_convert.
 TARGET_NAMING (h5format_convert STATIC)
 TARGET_C_PROPERTIES (h5format_convert STATIC " " " ")
 target_link_libraries (h5format_convert  ${HDF5_TOOLS_LIB_TARGET} ${HDF5_LIB_TARGET})
-set_target_properties (h5format_convert PROPERTIES FOLDER tools)
+set_target_properties (h5format_convert PROPERTIES FOLDER External/hdf5)
 
 set (H5_DEP_EXECUTABLES h5format_convert)
 
@@ -25,14 +25,14 @@ if (BUILD_TESTING)
   TARGET_NAMING (h5fc_chk_idx STATIC)
   TARGET_C_PROPERTIES (h5fc_chk_idx STATIC " " " ")
   target_link_libraries (h5fc_chk_idx ${HDF5_LIB_TARGET} ${HDF5_TOOLS_LIB_TARGET})
-  set_target_properties (h5fc_chk_idx PROPERTIES FOLDER tools)
+  set_target_properties (h5fc_chk_idx PROPERTIES FOLDER External/hdf5)
 
   if (HDF5_BUILD_GENERATORS)
     add_executable (h5fc_gentest ${HDF5_TOOLS_H5FC_SOURCE_DIR}/h5fc_gentest.c)
     TARGET_NAMING (h5fc_gentest STATIC)
     TARGET_C_PROPERTIES (h5fc_gentest STATIC " " " ")
     target_link_libraries (h5fc_gentest ${HDF5_LIB_TARGET} ${HDF5_TOOLS_LIB_TARGET})
-    set_target_properties (h5fc_gentest PROPERTIES FOLDER generator/tools)
+    set_target_properties (h5fc_gentest PROPERTIES FOLDER External/hdf5)
 
     #add_test (NAME h5fc_gentest COMMAND $<TARGET_FILE:h5fc_gentest>)
   endif (HDF5_BUILD_GENERATORS)

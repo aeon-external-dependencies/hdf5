@@ -29,6 +29,6 @@ if (WIN32 AND MSVC)
 endif (WIN32 AND MSVC)
 target_include_directories (parallel_test PRIVATE ${CMAKE_Fortran_MODULE_DIRECTORY}/static)
 set_target_properties (parallel_test PROPERTIES LINKER_LANGUAGE Fortran)
-set_target_properties (parallel_test PROPERTIES FOLDER test/fortran)
+set_target_properties (parallel_test PROPERTIES FOLDER External/hdf5)
 
 include (CMakeTests.cmake)

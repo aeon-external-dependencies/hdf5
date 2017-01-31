@@ -831,6 +831,10 @@ add_custom_command (
     DEPENDS H5detect
 )
 
+set_target_properties (H5detect PROPERTIES
+  FOLDER External/hdf5
+)
+
 add_executable (H5make_libsettings ${HDF5_SRC_DIR}/H5make_libsettings.c)
 TARGET_C_PROPERTIES (H5make_libsettings STATIC " " " ")
 if (MSVC OR MINGW)
@@ -844,6 +848,10 @@ add_custom_command (
     ARGS > ${HDF5_BINARY_DIR}/H5lib_settings.c
     DEPENDS H5make_libsettings
     WORKING_DIRECTORY ${HDF5_BINARY_DIR}
+)
+
+set_target_properties (H5make_libsettings PROPERTIES
+  FOLDER External/hdf5
 )
 
 #-----------------------------------------------------------------------------
@@ -863,9 +871,11 @@ endif (H5_HAVE_PARALLEL AND MPI_C_FOUND)
 set_global_variable (HDF5_LIBRARIES_TO_EXPORT ${HDF5_LIB_TARGET})
 H5_SET_LIB_OPTIONS (${HDF5_LIB_TARGET} ${HDF5_LIB_NAME} STATIC)
 set_target_properties (${HDF5_LIB_TARGET} PROPERTIES
-    FOLDER libraries
+    FOLDER External/hdf5
     INTERFACE_INCLUDE_DIRECTORIES "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>"
 )
+
+target_include_directories(${HDF5_LIB_TARGET} PUBLIC ${HDF5_BINARY_DIR})
 
 option (HDF5_ENABLE_DEBUG_APIS "Turn on extra debug output in all packages" OFF)
 if (HDF5_ENABLE_DEBUG_APIS)
@@ -907,7 +917,7 @@ if (BUILD_SHARED_LIBS)
   set_global_variable (HDF5_LIBRARIES_TO_EXPORT "${HDF5_LIBRARIES_TO_EXPORT};${HDF5_LIBSH_TARGET}")
   H5_SET_LIB_OPTIONS (${HDF5_LIBSH_TARGET} ${HDF5_LIB_NAME} SHARED ${HDF5_PACKAGE_SOVERSION})
   set_target_properties (${HDF5_LIBSH_TARGET} PROPERTIES
-      FOLDER libraries
+      FOLDER External/hdf5
       COMPILE_DEFINITIONS "H5_BUILT_AS_DYNAMIC_LIB"
       INTERFACE_INCLUDE_DIRECTORIES "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>"
       INTERFACE_COMPILE_DEFINITIONS H5_BUILT_AS_DYNAMIC_LIB=1

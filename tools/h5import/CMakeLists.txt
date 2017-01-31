@@ -14,7 +14,7 @@ TARGET_NAMING (h5import STATIC)
 TARGET_C_PROPERTIES (h5import STATIC " " " ")
 target_link_libraries (h5import  ${HDF5_TOOLS_LIB_TARGET} ${HDF5_LIB_TARGET})
 #set_target_properties (h5import PROPERTIES COMPILE_DEFINITIONS H5DEBUGIMPORT)
-set_target_properties (h5import PROPERTIES FOLDER tools)
+set_target_properties (h5import PROPERTIES FOLDER External/hdf5)
 
 set (H5_DEP_EXECUTABLES h5import)
 
@@ -26,7 +26,7 @@ if (BUILD_TESTING)
   TARGET_NAMING (h5importtest STATIC)
   TARGET_C_PROPERTIES (h5importtest STATIC " " " ")
   target_link_libraries (h5importtest ${HDF5_LIB_TARGET} ${HDF5_TOOLS_LIB_TARGET})
-  set_target_properties (h5importtest PROPERTIES FOLDER tools)
+  set_target_properties (h5importtest PROPERTIES FOLDER External/hdf5)
 
   include (CMakeTests.cmake)
 

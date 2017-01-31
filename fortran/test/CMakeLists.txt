@@ -54,7 +54,7 @@ target_link_libraries (${HDF5_F90_C_TEST_LIB_TARGET}
 )
 H5_SET_LIB_OPTIONS (${HDF5_F90_C_TEST_LIB_TARGET} ${HDF5_F90_C_TEST_LIB_NAME} STATIC)
 set_target_properties (${HDF5_F90_C_TEST_LIB_TARGET} PROPERTIES
-    FOLDER libraries/test/fortran
+    FOLDER External/hdf5
     LINKER_LANGUAGE C
     INTERFACE_INCLUDE_DIRECTORIES "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>"
 )
@@ -67,7 +67,7 @@ if (BUILD_SHARED_LIBS AND NOT SKIP_HDF5_FORTRAN_SHARED)
   )
   H5_SET_LIB_OPTIONS (${HDF5_F90_C_TEST_LIBSH_TARGET} ${HDF5_F90_C_TEST_LIB_NAME} SHARED ${HDF5_PACKAGE_SOVERSION})
   set_target_properties (${HDF5_F90_C_TEST_LIBSH_TARGET} PROPERTIES
-      FOLDER libraries/test/fortran
+      FOLDER External/hdf5
       LINKER_LANGUAGE C
       COMPILE_DEFINITIONS "H5_BUILT_AS_DYNAMIC_LIB"
       INTERFACE_INCLUDE_DIRECTORIES "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>"
@@ -107,7 +107,7 @@ target_link_libraries (${HDF5_F90_TEST_LIB_TARGET}
 H5_SET_LIB_OPTIONS (${HDF5_F90_TEST_LIB_TARGET} ${HDF5_F90_TEST_LIB_NAME} STATIC)
 target_include_directories (${HDF5_F90_TEST_LIB_TARGET} PRIVATE ${CMAKE_Fortran_MODULE_DIRECTORY}/static)
 set_target_properties (${HDF5_F90_TEST_LIB_TARGET} PROPERTIES
-    FOLDER libraries/test/fortran
+    FOLDER External/hdf5
     LINKER_LANGUAGE Fortran
     INTERFACE_INCLUDE_DIRECTORIES "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>"
     Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/static
@@ -131,7 +131,7 @@ if (BUILD_SHARED_LIBS AND NOT SKIP_HDF5_FORTRAN_SHARED)
   H5_SET_LIB_OPTIONS (${HDF5_F90_TEST_LIBSH_TARGET} ${HDF5_F90_TEST_LIB_NAME} SHARED ${HDF5_PACKAGE_SOVERSION})
   target_include_directories (${HDF5_F90_TEST_LIBSH_TARGET} PRIVATE ${CMAKE_Fortran_MODULE_DIRECTORY}/shared)
   set_target_properties (${HDF5_F90_TEST_LIBSH_TARGET} PROPERTIES
-      FOLDER libraries/test/fortran
+      FOLDER External/hdf5
       LINKER_LANGUAGE Fortran
       COMPILE_DEFINITIONS "H5_BUILT_AS_DYNAMIC_LIB"
       INTERFACE_INCLUDE_DIRECTORIES "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>"
@@ -180,7 +180,7 @@ endif (WIN32 AND MSVC)
 target_include_directories (testhdf5_fortran PRIVATE ${CMAKE_Fortran_MODULE_DIRECTORY}/static)
 set_target_properties (testhdf5_fortran PROPERTIES
     LINKER_LANGUAGE Fortran
-    FOLDER test/fortran
+    FOLDER External/hdf5
     Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/static
 )
 add_dependencies (testhdf5_fortran ${HDF5_F90_TEST_LIB_TARGET})
@@ -216,7 +216,7 @@ if (BUILD_SHARED_LIBS AND NOT SKIP_HDF5_FORTRAN_SHARED)
   target_include_directories (testhdf5_fortran-shared PRIVATE ${CMAKE_Fortran_MODULE_DIRECTORY}/shared)
   set_target_properties (testhdf5_fortran-shared PROPERTIES
         LINKER_LANGUAGE Fortran
-        FOLDER test/fortran
+        FOLDER External/hdf5
         Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/shared
   )
   add_dependencies (testhdf5_fortran-shared ${HDF5_F90_TEST_LIBSH_TARGET})
@@ -244,7 +244,7 @@ endif (WIN32 AND MSVC)
 target_include_directories (testhdf5_fortran_1_8 PRIVATE ${CMAKE_Fortran_MODULE_DIRECTORY}/static)
 set_target_properties (testhdf5_fortran_1_8 PROPERTIES
     LINKER_LANGUAGE Fortran
-    FOLDER test/fortran
+    FOLDER External/hdf5
     Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/static
 )
 add_dependencies (testhdf5_fortran_1_8 ${HDF5_F90_TEST_LIB_TARGET})
@@ -271,7 +271,7 @@ if (BUILD_SHARED_LIBS AND NOT SKIP_HDF5_FORTRAN_SHARED)
   target_include_directories (testhdf5_fortran_1_8-shared PRIVATE ${CMAKE_Fortran_MODULE_DIRECTORY}/shared)
   set_target_properties (testhdf5_fortran_1_8-shared PROPERTIES
         LINKER_LANGUAGE Fortran
-        FOLDER test/fortran
+        FOLDER External/hdf5
         Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/shared
   )
   add_dependencies (testhdf5_fortran_1_8-shared ${HDF5_F90_TEST_LIBSH_TARGET})
@@ -301,7 +301,7 @@ endif (WIN32 AND MSVC)
 target_include_directories (fortranlib_test_F03 PRIVATE ${CMAKE_Fortran_MODULE_DIRECTORY}/static)
 set_target_properties (fortranlib_test_F03 PROPERTIES
     LINKER_LANGUAGE Fortran
-    FOLDER test/fortran
+    FOLDER External/hdf5
     Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/static
 )
 add_dependencies (fortranlib_test_F03 ${HDF5_F90_TEST_LIB_TARGET})
@@ -330,7 +330,7 @@ if (BUILD_SHARED_LIBS AND NOT SKIP_HDF5_FORTRAN_SHARED)
   target_include_directories (fortranlib_test_F03-shared PRIVATE ${CMAKE_Fortran_MODULE_DIRECTORY}/shared)
   set_target_properties (fortranlib_test_F03-shared PROPERTIES
       LINKER_LANGUAGE Fortran
-      FOLDER test/fortran
+      FOLDER External/hdf5
       Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/shared
   )
   add_dependencies (fortranlib_test_F03-shared ${HDF5_F90_TEST_LIBSH_TARGET})
@@ -351,7 +351,7 @@ endif (WIN32 AND MSVC)
 target_include_directories (fflush1 PRIVATE ${CMAKE_Fortran_MODULE_DIRECTORY}/static)
 set_target_properties (fflush1 PROPERTIES
     LINKER_LANGUAGE Fortran
-    FOLDER test/fortran
+    FOLDER External/hdf5
     Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/static
 )
 add_dependencies (fflush1 ${HDF5_F90_TEST_LIB_TARGET})
@@ -371,7 +371,7 @@ if (BUILD_SHARED_LIBS AND NOT SKIP_HDF5_FORTRAN_SHARED)
   target_include_directories (fflush1-shared PRIVATE ${CMAKE_Fortran_MODULE_DIRECTORY}/shared)
   set_target_properties (fflush1-shared PROPERTIES
         LINKER_LANGUAGE Fortran
-        FOLDER test/fortran
+        FOLDER External/hdf5
         Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/shared
   )
   add_dependencies (fflush1-shared ${HDF5_F90_TEST_LIBSH_TARGET})
@@ -412,7 +412,7 @@ if (BUILD_SHARED_LIBS AND NOT SKIP_HDF5_FORTRAN_SHARED)
   target_include_directories (fflush2-shared PRIVATE ${CMAKE_Fortran_MODULE_DIRECTORY}/shared)
   set_target_properties (fflush2-shared PROPERTIES
         LINKER_LANGUAGE Fortran
-        FOLDER test/fortran
+        FOLDER External/hdf5
         Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/shared
   )
   add_dependencies (fflush2-shared ${HDF5_F90_TEST_LIBSH_TARGET})

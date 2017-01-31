@@ -24,7 +24,7 @@ add_executable (h5repack ${REPACK_COMMON_SRCS} ${HDF5_TOOLS_H5REPACK_SOURCE_DIR}
 TARGET_NAMING (h5repack STATIC)
 TARGET_C_PROPERTIES (h5repack STATIC " " " ")
 target_link_libraries (h5repack  ${HDF5_TOOLS_LIB_TARGET} ${HDF5_LIB_TARGET})
-set_target_properties (h5repack PROPERTIES FOLDER tools)
+set_target_properties (h5repack PROPERTIES FOLDER External/hdf5)
 
 set (H5_DEP_EXECUTABLES h5repack)
 
@@ -36,13 +36,13 @@ if (BUILD_TESTING)
   TARGET_NAMING (testh5repack_detect_szip STATIC)
   TARGET_C_PROPERTIES (testh5repack_detect_szip STATIC " " " ")
   target_link_libraries (testh5repack_detect_szip ${HDF5_LIB_TARGET} ${HDF5_TOOLS_LIB_TARGET} ${HDF5_TEST_LIB_TARGET})
-  set_target_properties (testh5repack_detect_szip PROPERTIES FOLDER tools)
+  set_target_properties (testh5repack_detect_szip PROPERTIES FOLDER External/hdf5)
 
   add_executable (h5repacktest ${REPACK_COMMON_SRCS} ${HDF5_TOOLS_H5REPACK_SOURCE_DIR}/h5repacktst.c)
   TARGET_NAMING (h5repacktest STATIC)
   TARGET_C_PROPERTIES (h5repacktest STATIC " " " ")
   target_link_libraries (h5repacktest  ${HDF5_TOOLS_LIB_TARGET} ${HDF5_TEST_LIB_TARGET})
-  set_target_properties (h5repacktest PROPERTIES FOLDER tools)
+  set_target_properties (h5repacktest PROPERTIES FOLDER External/hdf5)
 
   #-----------------------------------------------------------------------------
   # If plugin library tests can be tested

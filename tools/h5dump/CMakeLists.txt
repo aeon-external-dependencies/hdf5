@@ -17,7 +17,7 @@ add_executable (h5dump
 TARGET_NAMING (h5dump STATIC)
 TARGET_C_PROPERTIES (h5dump STATIC " " " ")
 target_link_libraries (h5dump  ${HDF5_TOOLS_LIB_TARGET} ${HDF5_LIB_TARGET})
-set_target_properties (h5dump PROPERTIES FOLDER tools)
+set_target_properties (h5dump PROPERTIES FOLDER External/hdf5)
 
 set (H5_DEP_EXECUTABLES h5dump)
 
@@ -30,7 +30,7 @@ if (BUILD_TESTING)
     TARGET_NAMING (h5dumpgentest STATIC)
     TARGET_C_PROPERTIES (h5dumpgentest STATIC " " " ")
     target_link_libraries (h5dumpgentest ${HDF5_LIB_TARGET} ${HDF5_TOOLS_LIB_TARGET})
-    set_target_properties (h5dumpgentest PROPERTIES FOLDER generator/tools)
+    set_target_properties (h5dumpgentest PROPERTIES FOLDER External/hdf5)
     
     #add_test (NAME h5dumpgentest COMMAND $<TARGET_FILE:h5dumpgentest>)
   endif (HDF5_BUILD_GENERATORS)

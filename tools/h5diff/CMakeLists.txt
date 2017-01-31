@@ -16,7 +16,7 @@ add_executable (h5diff
 TARGET_NAMING (h5diff STATIC)
 TARGET_C_PROPERTIES (h5diff STATIC " " " ")
 target_link_libraries (h5diff  ${HDF5_TOOLS_LIB_TARGET} ${HDF5_LIB_TARGET})
-set_target_properties (h5diff PROPERTIES FOLDER tools)
+set_target_properties (h5diff PROPERTIES FOLDER External/hdf5)
 
 set (H5_DEP_EXECUTABLES h5diff)
 
@@ -28,7 +28,7 @@ if (H5_HAVE_PARALLEL)
   TARGET_NAMING (ph5diff STATIC)
   TARGET_C_PROPERTIES (ph5diff STATIC " " " ")
   target_link_libraries (ph5diff  ${HDF5_TOOLS_LIB_TARGET} ${HDF5_LIB_TARGET})
-  set_target_properties (ph5diff PROPERTIES FOLDER tools)
+  set_target_properties (ph5diff PROPERTIES FOLDER External/hdf5)
 endif (H5_HAVE_PARALLEL)
 
 if (BUILD_TESTING)
@@ -40,7 +40,7 @@ if (BUILD_TESTING)
     TARGET_NAMING (h5diffgentest STATIC)
     TARGET_C_PROPERTIES (h5diffgentest STATIC " " " ")
     target_link_libraries (h5diffgentest ${HDF5_LIB_TARGET})
-    set_target_properties (h5diffgentest PROPERTIES FOLDER generator/tools)
+    set_target_properties (h5diffgentest PROPERTIES FOLDER External/hdf5)
     
     #add_test (NAME h5diffgentest COMMAND $<TARGET_FILE:h5diffgentest>)
   endif (HDF5_BUILD_GENERATORS)

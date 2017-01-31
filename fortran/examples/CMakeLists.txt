@@ -49,7 +49,7 @@ foreach (example ${examples})
   target_include_directories (f90_ex_${example} PRIVATE ${CMAKE_Fortran_MODULE_DIRECTORY}/static)
   set_target_properties (f90_ex_${example} PROPERTIES
       LINKER_LANGUAGE Fortran
-      FOLDER examples/fortran
+      FOLDER External/hdf5
       Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/static
   )
   if (BUILD_SHARED_LIBS AND NOT SKIP_HDF5_FORTRAN_SHARED)
@@ -63,7 +63,7 @@ foreach (example ${examples})
     target_include_directories (f90_ex_${example}-shared PRIVATE ${CMAKE_Fortran_MODULE_DIRECTORY}/shared)
     set_target_properties (f90_ex_${example}-shared PROPERTIES
         LINKER_LANGUAGE Fortran
-        FOLDER examples/fortran
+        FOLDER External/hdf5
         Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/shared
     )
   endif (BUILD_SHARED_LIBS AND NOT SKIP_HDF5_FORTRAN_SHARED)
@@ -80,7 +80,7 @@ foreach (example ${F2003_examples})
   target_include_directories (f03_ex_${example} PRIVATE ${CMAKE_Fortran_MODULE_DIRECTORY}/static)
   set_target_properties (f03_ex_${example} PROPERTIES
       LINKER_LANGUAGE Fortran
-      FOLDER examples/fortran03
+      FOLDER External/hdf5
       Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}
   )
   if (BUILD_SHARED_LIBS AND NOT SKIP_HDF5_FORTRAN_SHARED)
@@ -94,7 +94,7 @@ foreach (example ${F2003_examples})
     target_include_directories (f03_ex_${example}-shared PRIVATE ${CMAKE_Fortran_MODULE_DIRECTORY}/shared)
     set_target_properties (f03_ex_${example}-shared PROPERTIES
         LINKER_LANGUAGE Fortran
-        FOLDER examples/fortran03
+        FOLDER External/hdf5
         Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/shared
     )
   endif (BUILD_SHARED_LIBS AND NOT SKIP_HDF5_FORTRAN_SHARED)
@@ -112,7 +112,7 @@ if (H5_HAVE_PARALLEL AND MPI_Fortran_FOUND)
   target_include_directories (f90_ex_ph5example PRIVATE ${CMAKE_Fortran_MODULE_DIRECTORY}/static)
   set_target_properties (f90_ex_ph5example PROPERTIES
       LINKER_LANGUAGE Fortran
-      FOLDER examples/fortran
+      FOLDER External/hdf5
       Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/static
   )
   if (BUILD_SHARED_LIBS AND NOT SKIP_HDF5_FORTRAN_SHARED)
@@ -127,7 +127,7 @@ if (H5_HAVE_PARALLEL AND MPI_Fortran_FOUND)
     target_include_directories (f90_ex_ph5example-shared PRIVATE ${CMAKE_Fortran_MODULE_DIRECTORY}/shared)
     set_target_properties (f90_ex_ph5example-shared PROPERTIES
         LINKER_LANGUAGE Fortran
-        FOLDER examples/fortran
+        FOLDER External/hdf5
         Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/shared
     )
   endif (BUILD_SHARED_LIBS AND NOT SKIP_HDF5_FORTRAN_SHARED)

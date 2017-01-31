@@ -26,6 +26,6 @@ target_link_libraries (
     ${HDF5_HL_LIB_TARGET}
     ${HDF5_HL_CPP_LIB_TARGET}
 )
-set_target_properties (hl_ptableTest PROPERTIES FOLDER test/hl/cpp)
+set_target_properties (hl_ptableTest PROPERTIES FOLDER External/hdf5)
 
 include (CMakeTests.cmake)

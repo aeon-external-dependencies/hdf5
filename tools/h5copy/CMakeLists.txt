@@ -13,7 +13,7 @@ add_executable (h5copy ${HDF5_TOOLS_H5COPY_SOURCE_DIR}/h5copy.c)
 TARGET_NAMING (h5copy STATIC)
 TARGET_C_PROPERTIES (h5copy STATIC " " " ")
 target_link_libraries (h5copy  ${HDF5_TOOLS_LIB_TARGET} ${HDF5_LIB_TARGET})
-set_target_properties (h5copy PROPERTIES FOLDER tools)
+set_target_properties (h5copy PROPERTIES FOLDER External/hdf5)
 
 set (H5_DEP_EXECUTABLES h5copy)
 
@@ -23,7 +23,7 @@ if (BUILD_TESTING)
     TARGET_NAMING (h5copygentest STATIC)
     TARGET_C_PROPERTIES (h5copygentest STATIC " " " ")
     target_link_libraries (h5copygentest ${HDF5_LIB_TARGET})
-    set_target_properties (h5copygentest PROPERTIES FOLDER generator/tools)
+    set_target_properties (h5copygentest PROPERTIES FOLDER External/hdf5)
 
     #add_test (NAME h5copygentest COMMAND $<TARGET_FILE:h5copygentest>)
   endif (HDF5_BUILD_GENERATORS)

@@ -31,7 +31,7 @@ foreach (example ${examples})
   TARGET_NAMING (hl_ex_${example} STATIC)
   TARGET_C_PROPERTIES (hl_ex_${example} STATIC " " " ")
   target_link_libraries (hl_ex_${example} ${HDF5_HL_LIB_TARGET} ${HDF5_LIB_TARGET})
-  set_target_properties (hl_ex_${example} PROPERTIES FOLDER examples/hl)
+  set_target_properties (hl_ex_${example} PROPERTIES FOLDER External/hdf5)
 endforeach (example ${examples})
 
 if (BUILD_TESTING)

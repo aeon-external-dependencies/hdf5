@@ -33,12 +33,12 @@ add_subdirectory (${HDF5_CPP_SOURCE_DIR}/src ${HDF5_CPP_BINARY_DIR}/src)
 # Build the CPP Examples
 #-----------------------------------------------------------------------------
 if (HDF5_BUILD_EXAMPLES)
-  add_subdirectory (${HDF5_CPP_SOURCE_DIR}/examples ${HDF5_CPP_BINARY_DIR}/examples)
+  #add_subdirectory (${HDF5_CPP_SOURCE_DIR}/examples ${HDF5_CPP_BINARY_DIR}/examples)
 endif (HDF5_BUILD_EXAMPLES)
 
 #-----------------------------------------------------------------------------
 # Build the CPP unit tests
 #-----------------------------------------------------------------------------
 if (BUILD_TESTING)
-  add_subdirectory (${HDF5_CPP_SOURCE_DIR}/test ${HDF5_CPP_BINARY_DIR}/test)
+  #add_subdirectory (${HDF5_CPP_SOURCE_DIR}/test ${HDF5_CPP_BINARY_DIR}/test)
 endif (BUILD_TESTING)

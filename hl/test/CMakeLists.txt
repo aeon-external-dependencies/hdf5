@@ -29,7 +29,7 @@ MACRO (HL_ADD_EXE hl_name)
       ${HDF5_TEST_LIB_TARGET}
       ${HDF5_LIB_TARGET}
   )
-  set_target_properties (hl_${hl_name} PROPERTIES FOLDER test/hl)
+  set_target_properties (hl_${hl_name} PROPERTIES FOLDER External/hdf5)
 ENDMACRO (HL_ADD_EXE)
 
 MACRO (HL_ADD_SHEXE hl_name)
@@ -41,7 +41,7 @@ MACRO (HL_ADD_SHEXE hl_name)
       ${HDF5_TEST_LIBSH_TARGET}
       ${HDF5_LIBSH_TARGET}
   )
-  set_target_properties (hl_${hl_name} PROPERTIES FOLDER test/hl)
+  set_target_properties (hl_${hl_name} PROPERTIES FOLDER External/hdf5)
 ENDMACRO (HL_ADD_SHEXE)
 
 HL_ADD_EXE (test_lite)
@@ -62,7 +62,7 @@ target_link_libraries (hl_test_packet
     ${HDF5_TEST_LIB_TARGET}
     ${HDF5_LIB_TARGET}
 )
-set_target_properties (hl_test_packet PROPERTIES FOLDER test/hl)
+set_target_properties (hl_test_packet PROPERTIES FOLDER External/hdf5)
 
 # --------------------------------------------------------------------
 # This executable is used to generate test files for the test_ds test.
@@ -77,7 +77,7 @@ if (HDF5_BUILD_GENERATORS)
       ${HDF5_TEST_LIB_TARGET}
       ${HDF5_LIB_TARGET}
   )
-  set_target_properties (hl_gen_test_ds PROPERTIES FOLDER test/hl/gen)
+  set_target_properties (hl_gen_test_ds PROPERTIES FOLDER External/hdf5)
 
   add_executable (hl_gen_test_ld gen_test_ld.c)
   TARGET_NAMING (hl_gen_test_ld STATIC)
@@ -87,7 +87,7 @@ if (HDF5_BUILD_GENERATORS)
       ${HDF5_TEST_LIB_TARGET}
       ${HDF5_LIB_TARGET}
   )
-  set_target_properties (hl_gen_test_ld PROPERTIES FOLDER test/hl/gen)
+  set_target_properties (hl_gen_test_ld PROPERTIES FOLDER External/hdf5)
 endif (HDF5_BUILD_GENERATORS)
 
 include (CMakeTests.cmake)

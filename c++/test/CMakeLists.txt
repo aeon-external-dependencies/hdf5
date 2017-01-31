@@ -44,7 +44,7 @@ target_link_libraries (cpp_testhdf5
     ${HDF5_TEST_LIB_TARGET}
 )
 set_target_properties (cpp_testhdf5 PROPERTIES
-    FOLDER test/cpp
+    FOLDER External/hdf5
     INTERFACE_INCLUDE_DIRECTORIES "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>"
 )
 

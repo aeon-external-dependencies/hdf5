@@ -25,7 +25,7 @@ foreach (example ${examples})
   )
   target_include_directories (hl_f90_ex_${example} PRIVATE ${CMAKE_Fortran_MODULE_DIRECTORY}/static)
   set_target_properties (hl_f90_ex_${example} PROPERTIES LINKER_LANGUAGE Fortran)
-  set_target_properties (hl_f90_ex_${example} PROPERTIES FOLDER examples/hl/fortran)
+  set_target_properties (hl_f90_ex_${example} PROPERTIES FOLDER External/hdf5)
 
 endforeach (example ${examples})
 

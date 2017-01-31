@@ -11,7 +11,7 @@ MACRO (ADD_H5_GENERATOR genfile)
   TARGET_NAMING (${genfile} STATIC)
   TARGET_C_PROPERTIES (${genfile} STATIC " " " ")
   target_link_libraries (${genfile} ${HDF5_LIB_TARGET} ${HDF5_TOOLS_LIB_TARGET})
-  set_target_properties (${genfile} PROPERTIES FOLDER generator/tools)
+  set_target_properties (${genfile} PROPERTIES FOLDER External/hdf5)
 ENDMACRO (ADD_H5_GENERATOR genfile)
 
 # generator executables

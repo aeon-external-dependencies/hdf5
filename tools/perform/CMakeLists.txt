@@ -24,7 +24,7 @@ add_executable (h5perf_serial ${h5perf_serial_SRCS})
 TARGET_NAMING (h5perf_serial STATIC)
 TARGET_C_PROPERTIES (h5perf_serial STATIC " " " ")
 target_link_libraries (h5perf_serial ${HDF5_LIB_TARGET} ${HDF5_TOOLS_LIB_TARGET})
-set_target_properties (h5perf_serial PROPERTIES FOLDER perform)
+set_target_properties (h5perf_serial PROPERTIES FOLDER External/hdf5)
 
 if (HDF5_BUILD_PERFORM_STANDALONE)
   #-- Adding test for h5perf_serial_alone
@@ -36,7 +36,7 @@ if (HDF5_BUILD_PERFORM_STANDALONE)
   TARGET_NAMING (h5perf_serial_alone STATIC)
   TARGET_C_PROPERTIES (h5perf_serial_alone STATIC " " " ")
   target_link_libraries (h5perf_serial_alone ${HDF5_LIB_TARGET} ${HDF5_TOOLS_LIB_TARGET})
-  set_target_properties (h5perf_serial_alone PROPERTIES FOLDER perform)
+  set_target_properties (h5perf_serial_alone PROPERTIES FOLDER External/hdf5)
   set_property (TARGET h5perf_serial_alone 
       APPEND PROPERTY COMPILE_DEFINITIONS STANDALONE
   )
@@ -50,7 +50,7 @@ ADD_EXECUTABLE(chunk ${chunk_SRCS})
 TARGET_NAMING (chunk STATIC)
 TARGET_C_PROPERTIES (chunk STATIC " " " ")
 TARGET_LINK_LIBRARIES(chunk ${HDF5_LIB_TARGET} ${HDF5_TOOLS_LIB_TARGET})
-set_target_properties (chunk PROPERTIES FOLDER perform)
+set_target_properties (chunk PROPERTIES FOLDER External/hdf5)
 
 #-- Adding test for iopipe
 set (iopipe_SRCS
@@ -60,7 +60,7 @@ add_executable (iopipe ${iopipe_SRCS})
 TARGET_NAMING (iopipe STATIC)
 TARGET_C_PROPERTIES (iopipe STATIC " " " ")
 target_link_libraries (iopipe ${HDF5_LIB_TARGET} ${HDF5_TOOLS_LIB_TARGET})
-set_target_properties (iopipe PROPERTIES FOLDER perform)
+set_target_properties (iopipe PROPERTIES FOLDER External/hdf5)
 
 #-- Adding test for overhead
 set (overhead_SRCS
@@ -70,7 +70,7 @@ add_executable (overhead ${overhead_SRCS})
 TARGET_NAMING (overhead STATIC)
 TARGET_C_PROPERTIES (overhead STATIC " " " ")
 target_link_libraries (overhead ${HDF5_LIB_TARGET} ${HDF5_TOOLS_LIB_TARGET})
-set_target_properties (overhead PROPERTIES FOLDER perform)
+set_target_properties (overhead PROPERTIES FOLDER External/hdf5)
 
 if (BUILD_TESTING)
 #-- Adding test for perf_meta
@@ -81,7 +81,7 @@ if (BUILD_TESTING)
   TARGET_NAMING (perf_meta STATIC)
   TARGET_C_PROPERTIES (perf_meta STATIC " " " ")
   target_link_libraries (perf_meta ${HDF5_LIB_TARGET} ${HDF5_TOOLS_LIB_TARGET} ${HDF5_TEST_LIB_TARGET})
-  set_target_properties (perf_meta PROPERTIES FOLDER perform)
+  set_target_properties (perf_meta PROPERTIES FOLDER External/hdf5)
 endif (BUILD_TESTING)
 
 #-- Adding test for zip_perf
@@ -92,7 +92,7 @@ add_executable (zip_perf ${zip_perf_SRCS})
 TARGET_NAMING (zip_perf STATIC)
 TARGET_C_PROPERTIES (zip_perf STATIC " " " ")
 target_link_libraries (zip_perf ${HDF5_TOOLS_LIB_TARGET} ${HDF5_LIB_TARGET})
-set_target_properties (zip_perf PROPERTIES FOLDER perform)
+set_target_properties (zip_perf PROPERTIES FOLDER External/hdf5)
 
 if (H5_HAVE_PARALLEL AND BUILD_TESTING)
   #-- Adding test for h5perf
@@ -104,7 +104,7 @@ if (H5_HAVE_PARALLEL AND BUILD_TESTING)
   TARGET_NAMING (h5perf STATIC)
   TARGET_C_PROPERTIES (h5perf STATIC " " " ")
   target_link_libraries (h5perf ${HDF5_LIB_TARGET} ${HDF5_TOOLS_LIB_TARGET} ${HDF5_TEST_LIB_TARGET})
-  set_target_properties (h5perf PROPERTIES FOLDER perform)
+  set_target_properties (h5perf PROPERTIES FOLDER External/hdf5)
 
   if (HDF5_BUILD_PERFORM_STANDALONE)
     #-- Adding test for h5perf
@@ -116,7 +116,7 @@ if (H5_HAVE_PARALLEL AND BUILD_TESTING)
     TARGET_NAMING (h5perf_alone STATIC)
     TARGET_C_PROPERTIES (h5perf_alone STATIC " " " ")
     target_link_libraries (h5perf_alone ${HDF5_LIB_TARGET} ${HDF5_TOOLS_LIB_TARGET} ${HDF5_TEST_LIB_TARGET})
-    set_target_properties (h5perf_alone PROPERTIES FOLDER perform)
+    set_target_properties (h5perf_alone PROPERTIES FOLDER External/hdf5)
     set_property (TARGET h5perf_alone 
         APPEND PROPERTY COMPILE_DEFINITIONS STANDALONE
     )

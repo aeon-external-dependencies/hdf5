@@ -21,12 +21,12 @@ endif (HDF5_BUILD_TOOLS)
 
 #-- Add High Level Examples
 if (HDF5_BUILD_EXAMPLES)
-  add_subdirectory (${HDF5_HL_SOURCE_DIR}/examples ${HDF5_HL_BINARY_DIR}/examples)
+  #add_subdirectory (${HDF5_HL_SOURCE_DIR}/examples ${HDF5_HL_BINARY_DIR}/examples)
 endif (HDF5_BUILD_EXAMPLES)
 
 #-- Build the Unit testing if requested
 if (NOT HDF5_EXTERNALLY_CONFIGURED)
   if (BUILD_TESTING)
-    add_subdirectory (${HDF5_HL_SOURCE_DIR}/test ${HDF5_HL_BINARY_DIR}/test)
+    #add_subdirectory (${HDF5_HL_SOURCE_DIR}/test ${HDF5_HL_BINARY_DIR}/test)
   endif (BUILD_TESTING)
 endif (NOT HDF5_EXTERNALLY_CONFIGURED)
