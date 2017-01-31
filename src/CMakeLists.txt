@@ -875,7 +875,7 @@ set_target_properties (${HDF5_LIB_TARGET} PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>"
 )
 
-target_include_directories(${HDF5_LIB_TARGET} PUBLIC ${HDF5_BINARY_DIR})
+target_include_directories(${HDF5_LIB_TARGET} PUBLIC $<BUILD_INTERFACE:${HDF5_BINARY_DIR}>)
 
 option (HDF5_ENABLE_DEBUG_APIS "Turn on extra debug output in all packages" OFF)
 if (HDF5_ENABLE_DEBUG_APIS)
