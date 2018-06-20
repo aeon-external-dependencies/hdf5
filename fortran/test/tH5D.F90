@@ -14,12 +14,10 @@
 !                                                                             *
 !   This file is part of HDF5.  The full HDF5 copyright notice, including     *
 !   terms governing use, modification, and redistribution, is contained in    *
-!   the files COPYING and Copyright.html.  COPYING can be found at the root   *
-!   of the source code distribution tree; Copyright.html can be found at the  *
-!   root level of an installed copy of the electronic HDF5 document set and   *
-!   is linked from the top-level documents page.  It can also be found at     *
-!   http://hdfgroup.org/HDF5/doc/Copyright.html.  If you do not have          *
-!   access to either file, you may request a copy from help@hdfgroup.org.     *
+!   the COPYING file, which can be found at the root of the source code       *
+!   distribution tree, or in https://support.hdfgroup.org/ftp/HDF5/releases.  *
+!   If you do not have access to either file, you may request a copy from     *
+!   help@hdfgroup.org.                                                        *
 ! * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 !
 ! NOTES
@@ -529,7 +527,7 @@ CONTAINS
 
     INTEGER(hid_t) :: file, fcpl, dataset, space
     INTEGER :: i, j, n, ios
-    INTEGER(hsize_t), DIMENSION(1:2) ::	dims
+    INTEGER(hsize_t), DIMENSION(1:2) :: dims
     INTEGER(haddr_t) :: offset
     INTEGER, DIMENSION(1:dset_dim1,1:dset_dim2), TARGET :: rdata, data_in
     INTEGER :: error
@@ -622,6 +620,11 @@ CONTAINS
     END DO
 
     CLOSE(10)
+
+    IF(cleanup) CALL h5_cleanup_f(fix_filename, H5P_DEFAULT_F, error)
+    CALL check("h5_cleanup_f", error, total_error)
+    IF(cleanup) CALL h5_cleanup_f(filename, H5P_DEFAULT_F, error)
+    CALL check("h5_cleanup_f", error, total_error)
     
   END SUBROUTINE test_userblock_offset
 

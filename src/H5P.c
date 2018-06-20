@@ -5,12 +5,10 @@
  *                                                                           *
  * This file is part of HDF5.  The full HDF5 copyright notice, including     *
  * terms governing use, modification, and redistribution, is contained in    *
- * the files COPYING and Copyright.html.  COPYING can be found at the root   *
- * of the source code distribution tree; Copyright.html can be found at the  *
- * root level of an installed copy of the electronic HDF5 document set and   *
- * is linked from the top-level documents page.  It can also be found at     *
- * http://hdfgroup.org/HDF5/doc/Copyright.html.  If you do not have          *
- * access to either file, you may request a copy from help@hdfgroup.org.     *
+ * the COPYING file, which can be found at the root of the source code       *
+ * distribution tree, or in https://support.hdfgroup.org/ftp/HDF5/releases.  *
+ * If you do not have access to either file, you may request a copy from     *
+ * help@hdfgroup.org.                                                        *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /* Programmer:  Quincey Koziol <koziol@ncsa.uiuc.edu>
@@ -28,10 +26,11 @@
 /***********/
 /* Headers */
 /***********/
-#include "H5private.h"		/* Generic Functions			*/
-#include "H5Eprivate.h"		/* Error handling		  	*/
-#include "H5Iprivate.h"		/* IDs			  		*/
-#include "H5Ppkg.h"		/* Property lists		  	*/
+#include "H5private.h"		/* Generic Functions    */
+#include "H5Eprivate.h"		/* Error handling       */
+#include "H5Iprivate.h"		/* IDs                  */
+#include "H5Ppkg.h"         /* Property lists       */
+#include "H5Fprivate.h"     /* Files                */
 
 /****************/
 /* Local Macros */
@@ -665,10 +664,10 @@ done:
  REVISION LOG
 --------------------------------------------------------------------------*/
 herr_t
-H5Pset(hid_t plist_id, const char *name, void *value)
+H5Pset(hid_t plist_id, const char *name, const void *value)
 {
     H5P_genplist_t *plist;      /* Property list to modify */
-    herr_t ret_value=SUCCEED;   /* return value */
+    herr_t ret_value = SUCCEED; /* return value */
 
     FUNC_ENTER_API(FAIL)
     H5TRACE3("e", "i*s*x", plist_id, name, value);
@@ -678,11 +677,11 @@ H5Pset(hid_t plist_id, const char *name, void *value)
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a property list");
     if(!name || !*name)
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "invalid property name");
-    if(value==NULL)
+    if(value == NULL)
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "invalied property value");
 
     /* Go set the value */
-    if(H5P_set(plist,name,value) < 0)
+    if(H5P_set(plist, name, value) < 0)
         HGOTO_ERROR(H5E_PLIST, H5E_CANTREGISTER, FAIL, "unable to set value in plist");
 
 done:
@@ -841,6 +840,10 @@ herr_t
 H5Pencode(hid_t plist_id, void *buf, size_t *nalloc)
 {
     H5P_genplist_t	*plist;         /* Property list to query */
+    H5P_genplist_t *fapl_plist;
+    hid_t new_fapl_id;
+    H5F_libver_t low_bound = H5F_LIBVER_V110;
+    H5F_libver_t high_bound = H5F_LIBVER_V110;
     herr_t ret_value = SUCCEED;          /* return value */
 
     FUNC_ENTER_API(FAIL)
@@ -851,7 +854,7 @@ H5Pencode(hid_t plist_id, void *buf, size_t *nalloc)
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a property list");
 
     /* Call the internal encode routine */
-    if((ret_value = H5P__encode(plist, TRUE, buf, nalloc)) < 0)
+    if((ret_value = H5P__encode(plist, TRUE, buf, nalloc, H5P_FILE_ACCESS_DEFAULT)) < 0)
         HGOTO_ERROR(H5E_PLIST, H5E_CANTENCODE, FAIL, "unable to encode property list");
 
 done:

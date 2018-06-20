@@ -5,32 +5,30 @@
  *                                                                           *
  * This file is part of HDF5.  The full HDF5 copyright notice, including     *
  * terms governing use, modification, and redistribution, is contained in    *
- * the files COPYING and Copyright.html.  COPYING can be found at the root   *
- * of the source code distribution tree; Copyright.html can be found at the  *
- * root level of an installed copy of the electronic HDF5 document set and   *
- * is linked from the top-level documents page.  It can also be found at     *
- * http://hdfgroup.org/HDF5/doc/Copyright.html.  If you do not have          *
- * access to either file, you may request a copy from help@hdfgroup.org.     *
+ * the COPYING file, which can be found at the root of the source code       *
+ * distribution tree, or in https://support.hdfgroup.org/ftp/HDF5/releases.  *
+ * If you do not have access to either file, you may request a copy from     *
+ * help@hdfgroup.org.                                                        *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /* Programmer:  Robb Matzke <matzke@llnl.gov>
  *              Tuesday, November 24, 1998
  */
 #include "h5test.h"
-#include "H5srcdir.h"
 #include "H5Iprivate.h"
+
 /*
  * This file needs to access private datatypes from the H5O package.
  * This file also needs to access the object header testing code.
  */
-#define H5O_FRIEND		/*suppress error about including H5Opkg	  */
+#define H5O_FRIEND        /*suppress error about including H5Opkg      */
 #define H5O_TESTING
 #include "H5Opkg.h"
 
 /*
  * This file needs to access private datatypes from the H5G package.
  */
-#define H5G_FRIEND		/*suppress error about including H5Gpkg	  */
+#define H5G_FRIEND        /*suppress error about including H5Gpkg      */
 #include "H5Gpkg.h"
 
 const char *FILENAME[] = {
@@ -51,24 +49,24 @@ const char *FILENAME[] = {
 
 /*
  *  Verify that messages are moved forward into a "continuation message":
- *	Create an object header with several continuation chunks
- *	Remove a message in the last chunk
- *	The remaining message(s) in the last chunk should be moved forward into the continuation message
- *	The process will repeat when the continuation message is big enough to hold all the
- *		messages in the last chunk.
- *	Result: the number of chunks should be reduced
+ *    Create an object header with several continuation chunks
+ *    Remove a message in the last chunk
+ *    The remaining message(s) in the last chunk should be moved forward into the continuation message
+ *    The process will repeat when the continuation message is big enough to hold all the
+ *        messages in the last chunk.
+ *    Result: the number of chunks should be reduced
  */
 static herr_t
 test_cont(char *filename, hid_t fapl)
 {
-    hid_t	file=-1;
-    H5F_t	*f = NULL;
+    hid_t    file=-1;
+    H5F_t    *f = NULL;
     H5O_hdr_info_t hdr_info;
-    H5O_loc_t	oh_locA, oh_locB;
-    time_t	time_new;
-    const char	*short_name = "T";
-    const char	*long_name = "This is the message";
-    size_t	nchunks;
+    H5O_loc_t    oh_locA, oh_locB;
+    time_t    time_new;
+    const char    *short_name = "T";
+    const char    *long_name = "This is the message";
+    size_t    nchunks;
 
     TESTING("object header continuation block");
 
@@ -136,9 +134,9 @@ test_cont(char *filename, hid_t fapl)
     if(hdr_info.nchunks >= nchunks)
         TEST_ERROR
 
-    if(H5O_close(&oh_locA) < 0)
+    if(H5O_close(&oh_locA, NULL) < 0)
         FAIL_STACK_ERROR
-    if(H5O_close(&oh_locB) < 0)
+    if(H5O_close(&oh_locB, NULL) < 0)
         FAIL_STACK_ERROR
     if(H5Fclose(file) < 0)
         FAIL_STACK_ERROR
@@ -150,8 +148,8 @@ test_cont(char *filename, hid_t fapl)
 
 error:
     H5E_BEGIN_TRY {
-        H5O_close(&oh_locA);
-        H5O_close(&oh_locB);
+        H5O_close(&oh_locA, NULL);
+        H5O_close(&oh_locB, NULL);
         H5Fclose(file);
     } H5E_END_TRY;
 
@@ -169,15 +167,15 @@ error:
 static herr_t
 test_ohdr_cache(char *filename, hid_t fapl)
 {
-    hid_t	file = -1;              /* File ID */
+    hid_t    file = -1;              /* File ID */
     hid_t       my_fapl;                /* FAPL ID */
     hid_t       my_dxpl;                /* DXPL ID */
     H5AC_cache_config_t mdc_config;     /* Metadata cache configuration info */
-    H5F_t	*f = NULL;              /* File handle */
+    H5F_t    *f = NULL;              /* File handle */
     H5HL_t      *lheap, *lheap2, *lheap3; /* Pointer to local heaps */
     haddr_t     lheap_addr, lheap_addr2, lheap_addr3; /* Local heap addresses */
-    H5O_loc_t	oh_loc;                 /* Object header location */
-    time_t	time_new;               /* Time value for modification time message */
+    H5O_loc_t    oh_loc;                 /* Object header location */
+    time_t    time_new;               /* Time value for modification time message */
     unsigned    rc;                     /* Refcount for object */
 
     TESTING("object header creation in cache");
@@ -205,7 +203,7 @@ test_ohdr_cache(char *filename, hid_t fapl)
     if((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, my_fapl)) < 0)
         FAIL_STACK_ERROR
     if(H5Pclose(my_fapl) < 0)
-	FAIL_STACK_ERROR
+        FAIL_STACK_ERROR
     if(NULL == (f = (H5F_t *)H5I_object(file)))
         FAIL_STACK_ERROR
     if(H5AC_ignore_tags(f) < 0)
@@ -277,7 +275,7 @@ test_ohdr_cache(char *filename, hid_t fapl)
         FAIL_STACK_ERROR
 
     /* Close object header created */
-    if(H5O_close(&oh_loc) < 0)
+    if(H5O_close(&oh_loc, NULL) < 0)
         FAIL_STACK_ERROR
 
     /* Unprotect local heap (which actually unpins it from the cache) */
@@ -304,23 +302,24 @@ error:
 /*
  *  To exercise the coding for the re-read of the object header for SWMR access.
  *  When the object header is read in H5O_load() of H5Ocache.c, the library initially reads
- *  512 bytes for decoding, then reads the remaining bytes later if the object header is
- *  greater than 512 bytes.  For SWMR access, the read should be done all at one time.
+ *  H5O_SPEC_READ_SIZE (512, currently)  bytes for decoding, then reads the
+ *  remaining bytes later if the object header is greater than H5O_SPEC_READ_SIZE
+ *  bytes.  For SWMR access, the read should be done all at one time.
  */
 static herr_t
 test_ohdr_swmr(hbool_t new_format)
 {
-    hid_t fid = -1;			    /* File ID */
-    hid_t fapl = -1;			/* File access property list */
-    hid_t did = -1;			    /* Dataset ID */
+    hid_t fid = -1;                /* File ID */
+    hid_t fapl = -1;            /* File access property list */
+    hid_t did = -1;                /* Dataset ID */
     hid_t sid = -1;             /* Dataspace ID */
-    hid_t plist = -1;			/* Dataset creation property list */
-    size_t compact_size = 1024;	/* The size of compact dataset */
-    int *wbuf = NULL;			/* Buffer for writing */
-    hsize_t dims[1];			/* Dimension sizes */
-    size_t u;		            /* Iterator */
+    hid_t plist = -1;            /* Dataset creation property list */
+    size_t compact_size = 1024;    /* The size of compact dataset */
+    int *wbuf = NULL;            /* Buffer for writing */
+    hsize_t dims[1];            /* Dimension sizes */
+    size_t u;                    /* Iterator */
     int n;                      /* Data variable */
-    H5O_info_t obj_info;		/* Information for the object */
+    H5O_info_t obj_info;        /* Information for the object */
 
     if(new_format) {
         TESTING("exercise the coding for the re-read of the object header for SWMR access: latest-format");
@@ -340,10 +339,11 @@ test_ohdr_swmr(hbool_t new_format)
 
         if((fid = H5Fcreate(FILE_OHDR_SWMR, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0)
             TEST_ERROR
-        } else {
+    } /* end if */
+    else {
         if((fid = H5Fcreate(FILE_OHDR_SWMR, H5F_ACC_TRUNC|H5F_ACC_SWMR_WRITE, H5P_DEFAULT, fapl)) < 0)
             TEST_ERROR
-    } /* end if */
+    } /* end else */
 
     /* Initialize data */
     wbuf = (int *)HDcalloc(compact_size, sizeof(int));
@@ -355,7 +355,7 @@ test_ohdr_swmr(hbool_t new_format)
     dims[0] = (hsize_t)compact_size;
     if((sid = H5Screate_simple(1, dims, NULL)) < 0)
         FAIL_STACK_ERROR
-    
+
     /* Create property list for compact dataset creation */
     if((plist = H5Pcreate(H5P_DATASET_CREATE)) < 0)
         FAIL_STACK_ERROR
@@ -392,12 +392,13 @@ test_ohdr_swmr(hbool_t new_format)
     if(H5Oget_info(did, &obj_info) < 0)
         FAIL_STACK_ERROR
 
-    if(obj_info.hdr.version != OBJ_VERSION_LATEST)
-        FAIL_STACK_ERROR
+    if(new_format)
+        if(obj_info.hdr.version != OBJ_VERSION_LATEST)
+            FAIL_STACK_ERROR
 
-    /* The size of object header should be greater than the speculative read size of 512 */
+    /* The size of object header should be greater than the speculative read size of H5O_SPEC_READ_SIZE */
     /* This will exercise the coding for the re-read of the object header for SWMR access */
-    if(obj_info.hdr.space.total < 512)
+    if(obj_info.hdr.space.total < H5O_SPEC_READ_SIZE)
         TEST_ERROR;
 
     /* Close the dataset */
@@ -447,10 +448,10 @@ error:
 
 /*
  *  To test objects with unknown messages in a file with:
- *  	a) H5O_BOGUS_VALID_ID:
- *	   --the bogus_id is within the range of H5O_msg_class_g[]
- *  	b) H5O_BOGUS_INVALID_ID:
- *  	   --the bogus_id is outside the range of H5O_msg_class_g[]
+ *      a) H5O_BOGUS_VALID_ID:
+ *       --the bogus_id is within the range of H5O_msg_class_g[]
+ *      b) H5O_BOGUS_INVALID_ID:
+ *         --the bogus_id is outside the range of H5O_msg_class_g[]
  *
  *   The test file is FILE_BOGUS: "tbogus.h5" generated with gen_bogus.c
  *   --objects that have unknown header messages with H5O_BOGUS_VALID_ID in "/"
@@ -461,19 +462,19 @@ error:
 static herr_t
 test_unknown(unsigned bogus_id, char *filename, hid_t fapl)
 {
-    hid_t fid = -1;	/* file ID */
-    hid_t gid = -1;	/* group ID */
-    hid_t did = -1;	/* Dataset ID */
+    hid_t fid = -1;    /* file ID */
+    hid_t gid = -1;    /* group ID */
+    hid_t did = -1;    /* Dataset ID */
     hid_t sid = -1;     /* Dataspace ID */
     hid_t aid = -1;     /* Attribute ID */
-    hid_t loc = -1;	/* location: file or group ID */
-    hid_t fid_bogus = -1;	/* bogus file ID */
-    hid_t gid_bogus = -1;	/* bogus group ID */
-    hid_t loc_bogus = -1;	/* location: bogus file or group ID */
+    hid_t loc = -1;    /* location: file or group ID */
+    hid_t fid_bogus = -1;    /* bogus file ID */
+    hid_t gid_bogus = -1;    /* bogus group ID */
+    hid_t loc_bogus = -1;    /* location: bogus file or group ID */
     char testfile[256];
 
-    /* create a different name for a local copy of the data file to be 
-       opened with rd/wr file permissions in case build and test are 
+    /* create a different name for a local copy of the data file to be
+       opened with rd/wr file permissions in case build and test are
        done in the source directory. */
     HDstrncpy(testfile, FILE_BOGUS, strlen(FILE_BOGUS));
     testfile[strlen(FILE_BOGUS)]='\0';
@@ -496,7 +497,7 @@ test_unknown(unsigned bogus_id, char *filename, hid_t fapl)
     /* Set up location ID depending on bogus_id */
     if(bogus_id == H5O_BOGUS_INVALID_ID) {
         /* Open "group" in FILE_BOGUS */
-        if((gid_bogus = H5Gopen2(fid_bogus, "group", H5P_DEFAULT)) < 0) 
+        if((gid_bogus = H5Gopen2(fid_bogus, "group", H5P_DEFAULT)) < 0)
             FAIL_STACK_ERROR
         loc_bogus = gid_bogus;
 
@@ -561,7 +562,7 @@ test_unknown(unsigned bogus_id, char *filename, hid_t fapl)
     /* Set up location ID depending on bogus_id */
     if(bogus_id == H5O_BOGUS_INVALID_ID) {
         /* Open "group" in filename */
-        if((gid = H5Gopen2(fid, "group", H5P_DEFAULT)) < 0) 
+        if((gid = H5Gopen2(fid, "group", H5P_DEFAULT)) < 0)
             FAIL_STACK_ERROR
         loc = gid;
     } else
@@ -595,7 +596,7 @@ test_unknown(unsigned bogus_id, char *filename, hid_t fapl)
     /* Set up location ID depending on bogus_id */
     if(bogus_id == H5O_BOGUS_INVALID_ID) {
         /* Open "group" in filename */
-        if((gid = H5Gopen2(fid, "group", H5P_DEFAULT)) < 0) 
+        if((gid = H5Gopen2(fid, "group", H5P_DEFAULT)) < 0)
             FAIL_STACK_ERROR
         loc = gid;
     } else
@@ -641,7 +642,7 @@ test_unknown(unsigned bogus_id, char *filename, hid_t fapl)
     /* Set up location ID depending on bogus_id */
     if(bogus_id == H5O_BOGUS_INVALID_ID) {
         /* Open "group" in filename */
-        if((gid = H5Gopen2(fid, "group", H5P_DEFAULT)) < 0) 
+        if((gid = H5Gopen2(fid, "group", H5P_DEFAULT)) < 0)
             FAIL_STACK_ERROR
         loc = gid;
     } else
@@ -659,7 +660,7 @@ test_unknown(unsigned bogus_id, char *filename, hid_t fapl)
     if(H5Dclose(did) < 0)
         FAIL_STACK_ERROR
 
-    /* Closing: filename */ 
+    /* Closing: filename */
     if(bogus_id == H5O_BOGUS_INVALID_ID)
         if(H5Gclose(gid) < 0)
             FAIL_STACK_ERROR
@@ -684,7 +685,7 @@ test_unknown(unsigned bogus_id, char *filename, hid_t fapl)
     /* Set up location ID */
     if(bogus_id == H5O_BOGUS_INVALID_ID) {
         /* Open "group" in FILE_BOGUS */
-        if((gid_bogus = H5Gopen2(fid_bogus, "group", H5P_DEFAULT)) < 0) 
+        if((gid_bogus = H5Gopen2(fid_bogus, "group", H5P_DEFAULT)) < 0)
             FAIL_STACK_ERROR
         loc_bogus = gid_bogus;
     } else
@@ -715,7 +716,7 @@ test_unknown(unsigned bogus_id, char *filename, hid_t fapl)
     /* Closing: FILE_BOGUS */
     if(bogus_id == H5O_BOGUS_INVALID_ID)
         if(H5Gclose(gid_bogus) < 0)
-	        FAIL_STACK_ERROR
+            FAIL_STACK_ERROR
     if(H5Fclose(fid_bogus) < 0)
         FAIL_STACK_ERROR
 
@@ -737,51 +738,106 @@ error:
     return FAIL;
 } /* test_unknown() */
 
-
+#define STR_EARLIEST "earliest"
+#define STR_V18 "v18"
+#define STR_LATEST "latest"
+char *version_string(H5F_libver_t libver)
+{
+    char *str = NULL;
+
+    str = (char *) HDmalloc(20);
+    if (str == NULL)
+    {
+        fprintf(stderr, "Allocation failed\n");
+        exit(1);
+    }
+
+    switch(libver) {
+      case H5F_LIBVER_EARLIEST:
+          strcpy(str, STR_EARLIEST);
+          break;
+
+      case H5F_LIBVER_V18:
+          strcpy(str, STR_V18);
+          break;
+
+      case H5F_LIBVER_V110:
+          HDassert(H5F_LIBVER_LATEST == H5F_LIBVER_V110);
+          strcpy(str, STR_LATEST);
+          break;
+
+      case H5F_LIBVER_ERROR:
+      case H5F_LIBVER_NBOUNDS:
+      default:
+          sprintf(str, "%ld", (long)libver);
+          break;
+    } /* end switch */
+
+    /* Return the formed version bound string */
+    return(str);
+} /* end of version_string */
+
+
 /*-------------------------------------------------------------------------
- * Function:	main
+ * Function:    main
  *
  * Purpose:     Exercise private object header behavior and routines
  *
- * Return:	Success:        0
- *		Failure:        1
+ * Return:      Success: 0
+ *              Failure: 1
  *
- * Programmer:	Robb Matzke
+ * Programmer:    Robb Matzke
  *              Tuesday, November 24, 1998
+ *
+ * Modification:
+ *              - Added loop of combinations of low/high library format bounds
+ *                (BMR, Feb 2018)
  *
  *-------------------------------------------------------------------------
  */
 int
 main(void)
 {
-    hid_t	fapl = -1, file = -1;
-    hid_t	dset = -1;
-    H5F_t	*f = NULL;
-    char	filename[1024];
-    H5O_hdr_info_t hdr_info;            /* Object info */
-    H5O_loc_t	oh_loc, oh_loc2;        /* Object header locations */
-    time_t	time_new, ro;
-    int         chunkno;                /* Chunk index for message */
-    int		i;                      /* Local index variable */
-    unsigned    b;                      /* Index for "new format" loop */
-    herr_t      ret;                    /* Generic return value */
+    hid_t fapl = -1;
+    hid_t file = -1;
+    H5F_t *f = NULL;
+    char  filename[1024];
+    H5O_hdr_info_t hdr_info;  /* Object info */
+    H5O_loc_t      oh_loc;    /* Object header locations */
+    H5F_libver_t low, high;   /* File format bounds */
+    time_t time_new, ro;
+    unsigned b;               /* Index for "new format" loop */
+    char msg[80];             /* Message for file format version */
+    int    i;                 /* Local index variable */
+    herr_t ret;               /* Generic return value */
 
     /* Reset library */
     h5_reset();
     fapl = h5_fileaccess();
     h5_fixname(FILENAME[0], fapl, filename, sizeof filename);
 
-    /* Loop over old & new formats */
-    for(b = FALSE; b <= TRUE; b++) {
-        /* Display info about testing */
-        if(b)
-            HDputs("Using new file format:");
-        else
-            HDputs("Using default file format:");
+    /* Loop through all the combinations of low/high library format bounds */
+    for(low = H5F_LIBVER_EARLIEST; low < H5F_LIBVER_NBOUNDS; low++) {
+      for(high = H5F_LIBVER_EARLIEST; high < H5F_LIBVER_NBOUNDS; high++) {
+        char *low_string = NULL;
+        char *high_string = NULL;
 
-        /* Set the format to use for the file */
-        if(H5Pset_libver_bounds(fapl, (b ? H5F_LIBVER_LATEST : H5F_LIBVER_EARLIEST), H5F_LIBVER_LATEST) < 0)
-            FAIL_STACK_ERROR
+        /* Set version bounds before opening the file */
+        H5E_BEGIN_TRY {
+            ret = H5Pset_libver_bounds(fapl, low, high);
+        } H5E_END_TRY;
+
+        if (ret < 0) /* Invalid low/high combinations */
+            continue;
+
+        /* Display info about testing */
+        low_string = version_string(low);
+        high_string = version_string(high);
+        sprintf(msg, "Using file format version: (%s, %s)", low_string,
+                high_string);
+        HDputs(msg);
+        HDfree(high_string);
+        HDfree(low_string);
 
         /* test on object continuation block */
         if(test_cont(filename, fapl) < 0)
@@ -882,7 +938,7 @@ main(void)
          *  works correctly - QAK)
          */
         TESTING("close & re-open object header");
-        if(H5O_close(&oh_loc) < 0)
+        if(H5O_close(&oh_loc, NULL) < 0)
             FAIL_STACK_ERROR
         if(H5Fclose(file) < 0)
             FAIL_STACK_ERROR
@@ -957,150 +1013,8 @@ main(void)
 
         /* release resources */
         TESTING("object header closing");
-        if(H5O_close(&oh_loc) < 0)
+        if(H5O_close(&oh_loc, NULL) < 0)
             FAIL_STACK_ERROR
-        PASSED();
-
-        /*
-         * Test moving message to first chunk
-         */
-        TESTING("locking messages");
-        HDmemset(&oh_loc, 0, sizeof(oh_loc));
-        if(H5O_create(f, H5AC_ind_read_dxpl_id, (size_t)64, (size_t)0, H5P_GROUP_CREATE_DEFAULT, &oh_loc/*out*/) < 0)
-            FAIL_STACK_ERROR
-        if(1 != H5O_link(&oh_loc, 1, H5AC_ind_read_dxpl_id))
-            FAIL_STACK_ERROR
-
-        /* Create second object header, to guarantee that first object header uses multiple chunks */
-        HDmemset(&oh_loc2, 0, sizeof(oh_loc2));
-        if(H5O_create(f, H5AC_ind_read_dxpl_id, (size_t)64, (size_t)0, H5P_GROUP_CREATE_DEFAULT, &oh_loc2/*out*/) < 0)
-            FAIL_STACK_ERROR
-        if(1 != H5O_link(&oh_loc2, 1, H5AC_ind_read_dxpl_id))
-            FAIL_STACK_ERROR
-
-        /* Fill object header with messages, creating multiple chunks */
-        for(i = 0; i < 10; i++) {
-            time_new = (i + 1) * 1000 + 10;
-            if(H5O_msg_create(&oh_loc, H5O_MTIME_NEW_ID, 0, 0, &time_new, H5AC_ind_read_dxpl_id) < 0)
-                FAIL_STACK_ERROR
-        } /* end for */
-
-        /* Get # of object header chunks */
-        if(H5O_get_hdr_info(&oh_loc, H5AC_ind_read_dxpl_id, &hdr_info) < 0)
-            FAIL_STACK_ERROR
-        if(hdr_info.nchunks != 2)
-            TEST_ERROR
-
-        /* Add message to lock to object header */
-        time_new = 11111111;
-        if(H5O_msg_create(&oh_loc, H5O_MTIME_ID, 0, 0, &time_new, H5AC_ind_read_dxpl_id) < 0)
-            FAIL_STACK_ERROR
-
-        /* Verify chunk index for message */
-        if((chunkno = H5O_msg_get_chunkno(&oh_loc, H5O_MTIME_ID, H5AC_ind_read_dxpl_id)) < 0)
-            FAIL_STACK_ERROR
-        if(chunkno != 1)
-            TEST_ERROR
-
-        /* Lock the message into the chunk */
-        if(H5O_msg_lock(&oh_loc, H5O_MTIME_ID, H5AC_ind_read_dxpl_id) < 0)
-            FAIL_STACK_ERROR
-
-        /* Attempt to lock the message twice */
-        H5E_BEGIN_TRY {
-            ret = H5O_msg_lock(&oh_loc, H5O_MTIME_ID, H5AC_ind_read_dxpl_id);
-        } H5E_END_TRY;
-        if(ret >= 0)
-            TEST_ERROR
-
-        /* Delete all the other messages, which would move the message into
-         * chunk #0, if it wasn't locked
-         */
-        if(H5O_msg_remove(&oh_loc, H5O_MTIME_NEW_ID, H5O_ALL, TRUE, H5AC_ind_read_dxpl_id) < 0)
-            FAIL_STACK_ERROR
-
-        /* Verify chunk index for message */
-        if((chunkno = H5O_msg_get_chunkno(&oh_loc, H5O_MTIME_ID, H5AC_ind_read_dxpl_id)) < 0)
-            FAIL_STACK_ERROR
-        if(chunkno != 1)
-            TEST_ERROR
-
-        /* Unlock the message */
-        if(H5O_msg_unlock(&oh_loc, H5O_MTIME_ID, H5AC_ind_read_dxpl_id) < 0)
-            FAIL_STACK_ERROR
-
-        /* Attempt to unlock the message twice */
-        H5E_BEGIN_TRY {
-            ret = H5O_msg_unlock(&oh_loc, H5O_MTIME_ID, H5AC_ind_read_dxpl_id);
-        } H5E_END_TRY;
-        if(ret >= 0)
-            TEST_ERROR
-
-        /* Close object headers */
-        if(H5O_close(&oh_loc2) < 0)
-            FAIL_STACK_ERROR
-        if(H5O_close(&oh_loc) < 0)
-            FAIL_STACK_ERROR
-
-        /* Open first object header */
-        HDmemset(&oh_loc, 0, sizeof(oh_loc));
-        if(H5O_create(f, H5AC_ind_read_dxpl_id, (size_t)64, (size_t)0, H5P_GROUP_CREATE_DEFAULT, &oh_loc/*out*/) < 0)
-            FAIL_STACK_ERROR
-        if(1 != H5O_link(&oh_loc, 1, H5AC_ind_read_dxpl_id))
-            FAIL_STACK_ERROR
-
-        /* Create second object header, to guarantee that first object header uses multiple chunks */
-        HDmemset(&oh_loc2, 0, sizeof(oh_loc2));
-        if(H5O_create(f, H5AC_ind_read_dxpl_id, (size_t)64, (size_t)0, H5P_GROUP_CREATE_DEFAULT, &oh_loc2/*out*/) < 0)
-            FAIL_STACK_ERROR
-        if(1 != H5O_link(&oh_loc2, 1, H5AC_ind_read_dxpl_id))
-            FAIL_STACK_ERROR
-
-        /* Add message to move to object header */
-        time_new = 11111111;
-        if(H5O_msg_create(&oh_loc, H5O_MTIME_ID, 0, 0, &time_new, H5AC_ind_read_dxpl_id) < 0)
-            FAIL_STACK_ERROR
-
-        /* Verify chunk index for message */
-        if((chunkno = H5O_msg_get_chunkno(&oh_loc, H5O_MTIME_ID, H5AC_ind_read_dxpl_id)) < 0)
-            FAIL_STACK_ERROR
-        if(chunkno != 0)
-            TEST_ERROR
-
-        /* Lock the message into the chunk */
-        if(H5O_msg_lock(&oh_loc, H5O_MTIME_ID, H5AC_ind_read_dxpl_id) < 0)
-            FAIL_STACK_ERROR
-
-        /* Fill object header with messages, creating multiple chunks */
-        /* (would normally move locked message to new chunk) */
-        for(i = 0; i < 10; i++) {
-            time_new = (i + 1) * 1000 + 10;
-            if(H5O_msg_create(&oh_loc, H5O_MTIME_NEW_ID, 0, 0, &time_new, H5AC_ind_read_dxpl_id) < 0)
-                FAIL_STACK_ERROR
-        } /* end for */
-
-        /* Get # of object header chunks */
-        if(H5O_get_hdr_info(&oh_loc, H5AC_ind_read_dxpl_id, &hdr_info) < 0)
-            FAIL_STACK_ERROR
-        if(hdr_info.nchunks != 2)
-            TEST_ERROR
-
-        /* Verify chunk index for message */
-        if((chunkno = H5O_msg_get_chunkno(&oh_loc, H5O_MTIME_ID, H5AC_ind_read_dxpl_id)) < 0)
-            FAIL_STACK_ERROR
-        if(chunkno != 0)
-            TEST_ERROR
-
-        /* Unlock the message */
-        if(H5O_msg_unlock(&oh_loc, H5O_MTIME_ID, H5AC_ind_read_dxpl_id) < 0)
-            FAIL_STACK_ERROR
-
-        /* Close object headers */
-        if(H5O_close(&oh_loc2) < 0)
-            FAIL_STACK_ERROR
-        if(H5O_close(&oh_loc) < 0)
-            FAIL_STACK_ERROR
-
         PASSED();
 
         /* Close the file we created */
@@ -1120,7 +1034,9 @@ main(void)
         /* Test object header creation metadata cache issues */
         if(test_ohdr_cache(filename, fapl) < 0)
             TEST_ERROR
-    } /* end for */
+
+      } /* high */
+    } /* low */
 
     /* Verify symbol table messages are cached */
     if(h5_verify_cached_stabs(FILENAME, fapl) < 0) TEST_ERROR

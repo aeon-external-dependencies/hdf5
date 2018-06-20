@@ -5,12 +5,10 @@
  *                                                                           *
  * This file is part of HDF5.  The full HDF5 copyright notice, including     *
  * terms governing use, modification, and redistribution, is contained in    *
- * the files COPYING and Copyright.html.  COPYING can be found at the root   *
- * of the source code distribution tree; Copyright.html can be found at the  *
- * root level of an installed copy of the electronic HDF5 document set and   *
- * is linked from the top-level documents page.  It can also be found at     *
- * http://hdfgroup.org/HDF5/doc/Copyright.html.  If you do not have          *
- * access to either file, you may request a copy from help@hdfgroup.org.     *
+ * the COPYING file, which can be found at the root of the source code       *
+ * distribution tree, or in https://support.hdfgroup.org/ftp/HDF5/releases.  *
+ * If you do not have access to either file, you may request a copy from     *
+ * help@hdfgroup.org.                                                        *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /*
@@ -333,6 +331,9 @@ typedef struct {
 
 /* Typedef for datatype iteration operations */
 typedef herr_t (*H5T_operator_t)(H5T_t *dt, void *op_data/*in,out*/);
+
+/*  Array of versions for Datatype */
+H5_DLLVAR const unsigned H5O_dtype_ver_bounds[H5F_LIBVER_NBOUNDS];
 
 /*
  * Alignment information for native types. A value of N indicates that the
@@ -1288,8 +1289,8 @@ H5_DLL void H5T__bit_set_d(uint8_t *buf, size_t offset, size_t size,
 			   uint64_t val);
 H5_DLL ssize_t H5T__bit_find(uint8_t *buf, size_t offset, size_t size,
 			     H5T_sdir_t direction, hbool_t value);
-H5_DLL htri_t H5T__bit_inc(uint8_t *buf, size_t start, size_t size);
-H5_DLL htri_t H5T__bit_dec(uint8_t *buf, size_t start, size_t size);
+H5_DLL hbool_t H5T__bit_inc(uint8_t *buf, size_t start, size_t size);
+H5_DLL hbool_t H5T__bit_dec(uint8_t *buf, size_t start, size_t size);
 H5_DLL void H5T__bit_neg(uint8_t *buf, size_t start, size_t size);
 
 /* VL functions */

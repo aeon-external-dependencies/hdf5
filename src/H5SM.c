@@ -5,12 +5,10 @@
  *                                                                           *
  * This file is part of HDF5.  The full HDF5 copyright notice, including     *
  * terms governing use, modification, and redistribution, is contained in    *
- * the files COPYING and Copyright.html.  COPYING can be found at the root   *
- * of the source code distribution tree; Copyright.html can be found at the  *
- * root level of an installed copy of the electronic HDF5 document set and   *
- * is linked from the top-level documents page.  It can also be found at     *
- * http://hdfgroup.org/HDF5/doc/Copyright.html.  If you do not have          *
- * access to either file, you may request a copy from help@hdfgroup.org.     *
+ * the COPYING file, which can be found at the root of the source code       *
+ * distribution tree, or in https://support.hdfgroup.org/ftp/HDF5/releases.  *
+ * If you do not have access to either file, you may request a copy from     *
+ * help@hdfgroup.org.                                                        *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /****************/
@@ -72,7 +70,7 @@ static herr_t H5SM_write_mesg(H5F_t *f, hid_t dxpl_id, H5O_t *open_oh,
 static herr_t H5SM_decr_ref(void *record, void *op_data, hbool_t *changed);
 static herr_t H5SM_delete_from_index(H5F_t *f, hid_t dxpl_id, H5O_t *open_oh,
     H5SM_index_header_t *header, const H5O_shared_t * mesg,
-    unsigned *cache_flags, void ** /*out*/ encoded_mesg);
+    unsigned *cache_flags, size_t * /*out*/ mesg_size, void ** /*out*/ encoded_mesg);
 static herr_t H5SM_type_to_flag(unsigned type_id, unsigned *type_flag);
 static herr_t H5SM_read_iter_op(H5O_t *oh, H5O_mesg_t *mesg, unsigned sequence,
     unsigned *oh_modified, void *_udata);
@@ -144,11 +142,11 @@ H5SM_init(H5F_t *f, H5P_genplist_t * fc_plist, const H5O_loc_t *ext_loc, hid_t d
     HDassert(!H5F_addr_defined(H5F_SOHM_ADDR(f)));
 
     /* Set the ring type in the DXPL */
-    if(H5AC_set_ring(dxpl_id, H5AC_RING_US, &dxpl, &orig_ring) < 0)
+    if(H5AC_set_ring(dxpl_id, H5AC_RING_USER, &dxpl, &orig_ring) < 0)
         HGOTO_ERROR(H5E_SOHM, H5E_CANTSET, FAIL, "unable to set ring value")
 
     /* Initialize master table */
-    if(NULL == (table = H5FL_MALLOC(H5SM_master_table_t)))
+    if(NULL == (table = H5FL_CALLOC(H5SM_master_table_t)))
 	HGOTO_ERROR(H5E_SOHM, H5E_CANTALLOC, FAIL, "memory allocation failed for SOHM table")
     table->num_indexes = H5F_SOHM_NINDEXES(f);
     table->table_size = H5SM_TABLE_SIZE(f);
@@ -657,7 +655,7 @@ H5SM_create_list(H5F_t *f, H5SM_index_header_t *header, hid_t dxpl_id)
     num_entries = header->list_max;
 
     /* Allocate list in memory */
-    if(NULL == (list = H5FL_MALLOC(H5SM_list_t)))
+    if(NULL == (list = H5FL_CALLOC(H5SM_list_t)))
 	HGOTO_ERROR(H5E_SOHM, H5E_NOSPACE, HADDR_UNDEF, "file allocation failed for SOHM list")
     if(NULL == (list->messages = (H5SM_sohm_t *)H5FL_ARR_CALLOC(H5SM_sohm_t, num_entries)))
 	HGOTO_ERROR(H5E_SOHM, H5E_NOSPACE, HADDR_UNDEF, "file allocation failed for SOHM list")
@@ -1551,6 +1549,7 @@ H5SM_delete(H5F_t *f, hid_t dxpl_id, H5O_t *open_oh, H5O_shared_t *sh_mesg)
     unsigned              cache_flags = H5AC__NO_FLAGS_SET;
     H5SM_table_cache_ud_t cache_udata;      /* User-data for callback */
     ssize_t               index_num;
+    size_t                mesg_size = 0;
     void                 *mesg_buf = NULL;
     void                 *native_mesg = NULL;
     unsigned              type_id;              /* Message type ID to operate on */
@@ -1580,8 +1579,8 @@ H5SM_delete(H5F_t *f, hid_t dxpl_id, H5O_t *open_oh, H5O_shared_t *sh_mesg)
      * zero and any file space it uses needs to be freed.  mesg_buf holds the
      * serialized form of the message.
      */
-    if(H5SM_delete_from_index(f, dxpl_id, open_oh, &(table->indexes[index_num]), sh_mesg, &cache_flags, &mesg_buf) < 0)
-	HGOTO_ERROR(H5E_SOHM, H5E_CANTDELETE, FAIL, "unable to delete mesage from SOHM index")
+    if(H5SM_delete_from_index(f, dxpl_id, open_oh, &(table->indexes[index_num]), sh_mesg, &cache_flags, &mesg_size, &mesg_buf) < 0)
+        HGOTO_ERROR(H5E_SOHM, H5E_CANTDELETE, FAIL, "unable to delete mesage from SOHM index")
 
     /* Release the master SOHM table */
     if(H5AC_unprotect(f, dxpl_id, H5AC_SOHM_TABLE, H5F_SOHM_ADDR(f), table, cache_flags) < 0)
@@ -1593,7 +1592,7 @@ H5SM_delete(H5F_t *f, hid_t dxpl_id, H5O_t *open_oh, H5O_shared_t *sh_mesg)
      * master table needs to be unprotected when we do this.
      */
     if(mesg_buf) {
-        if(NULL == (native_mesg = H5O_msg_decode(f, dxpl_id, open_oh, type_id, (const unsigned char *)mesg_buf)))
+        if(NULL == (native_mesg = H5O_msg_decode(f, dxpl_id, open_oh, type_id, mesg_size, (const unsigned char *)mesg_buf)))
             HGOTO_ERROR(H5E_SOHM, H5E_CANTDECODE, FAIL, "can't decode shared message.")
 
         if(H5O_msg_delete(f, dxpl_id, open_oh, type_id, native_mesg) < 0)
@@ -1780,7 +1779,7 @@ H5SM_decr_ref(void *record, void *op_data, hbool_t *changed)
 static herr_t
 H5SM_delete_from_index(H5F_t *f, hid_t dxpl_id, H5O_t *open_oh,
     H5SM_index_header_t *header, const H5O_shared_t *mesg,
-    unsigned *cache_flags, void ** /*out*/ encoded_mesg)
+    unsigned *cache_flags, size_t * /*out*/ mesg_size, void ** /*out*/ encoded_mesg)
 {
     H5SM_list_t     *list = NULL;
     H5SM_mesg_key_t key;
@@ -1912,6 +1911,7 @@ H5SM_delete_from_index(H5F_t *f, hid_t dxpl_id, H5O_t *open_oh,
 
         /* Return the message's encoding so anything it references can be freed */
         *encoded_mesg = encoding_buf;
+        *mesg_size = buf_size;
 
         /* If there are no messages left in the index, delete it */
         if(header->num_messages == 0) {
@@ -1953,8 +1953,10 @@ done:
     /* Free the message encoding, if we're not returning it in encoded_mesg
      * or if there's been an error.
      */
-    if(encoding_buf && (NULL == *encoded_mesg || ret_value < 0))
+    if(encoding_buf && (NULL == *encoded_mesg || ret_value < 0)) {
         encoding_buf = H5MM_xfree(encoding_buf);
+        *mesg_size = 0;
+    }
 
     FUNC_LEAVE_NOAPI_TAG(ret_value, FAIL)
 } /* end H5SM_delete_from_index() */
@@ -2021,7 +2023,7 @@ H5SM_get_info(const H5O_loc_t *ext_loc, H5P_genplist_t *fc_plist, hid_t dxpl_id)
         cache_udata.f = f;
 
         /* Set the ring type in the DXPL */
-        if(H5AC_set_ring(dxpl_id, H5AC_RING_US, &dxpl, &orig_ring) < 0)
+        if(H5AC_set_ring(dxpl_id, H5AC_RING_USER, &dxpl, &orig_ring) < 0)
             HGOTO_ERROR(H5E_SOHM, H5E_CANTSET, FAIL, "unable to set ring value")
 
         /* Read the rest of the SOHM table information from the cache */
@@ -2436,7 +2438,7 @@ H5SM_read_mesg(H5F_t *f, const H5SM_sohm_t *mesg, H5HF_t *fheap,
 	        HGOTO_ERROR(H5E_SOHM, H5E_CANTLOAD, FAIL, "unable to open object header")
 
             /* Load the object header from the cache */
-            if(NULL == (oh = H5O_protect(&oloc, dxpl_id, H5AC__READ_ONLY_FLAG)))
+            if(NULL == (oh = H5O_protect(&oloc, dxpl_id, H5AC__READ_ONLY_FLAG, FALSE)))
 	        HGOTO_ERROR(H5E_SOHM, H5E_CANTPROTECT, FAIL, "unable to load object header")
         } /* end if */
         else
@@ -2467,7 +2469,7 @@ done:
     if(oh && oh != open_oh) {
         if(oh && H5O_unprotect(&oloc, dxpl_id, oh, H5AC__NO_FLAGS_SET) < 0)
             HDONE_ERROR(H5E_SOHM, H5E_CANTUNPROTECT, FAIL, "unable to release object header")
-        if(H5O_close(&oloc) < 0)
+        if(H5O_close(&oloc, NULL) < 0)
             HDONE_ERROR(H5E_SOHM, H5E_CANTCLOSEOBJ, FAIL, "unable to close object header")
     } /* end if */
 

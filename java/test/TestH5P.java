@@ -5,12 +5,10 @@
  *                                                                           *
  * This file is part of HDF5.  The full HDF5 copyright notice, including     *
  * terms governing use, modification, and redistribution, is contained in    *
- * the files COPYING and Copyright.html.  COPYING can be found at the root   *
- * of the source code distribution tree; Copyright.html can be found at the  *
- * root level of an installed copy of the electronic HDF5 document set and   *
- * is linked from the top-level documents page.  It can also be found at     *
- * http://hdfgroup.org/HDF5/doc/Copyright.html.  If you do not have          *
- * access to either file, you may request a copy from help@hdfgroup.org.     *
+ * the COPYING file, which can be found at the root of the source code       *
+ * distribution tree, or in https://support.hdfgroup.org/ftp/HDF5/releases.  *
+ * If you do not have access to either file, you may request a copy from     *
+ * help@hdfgroup.org.                                                        *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 package test;
@@ -30,6 +28,7 @@ import hdf.hdf5lib.exceptions.HDF5LibraryException;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -207,14 +206,14 @@ public class TestH5P {
         assertEquals(nlinks, 20L);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = HDF5FunctionArgumentException.class)
     public void testH5Pset_libver_bounds_invalidlow() throws Throwable {
         H5.H5Pset_libver_bounds(fapl_id, 5, HDF5Constants.H5F_LIBVER_LATEST);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = HDF5FunctionArgumentException.class)
     public void testH5Pset_libver_bounds_invalidhigh() throws Throwable {
-        H5.H5Pset_libver_bounds(fapl_id, HDF5Constants.H5F_LIBVER_LATEST, 5);
+        H5.H5Pset_libver_bounds(fapl_id, HDF5Constants.H5F_LIBVER_V110, HDF5Constants.H5F_LIBVER_V110+1);
     }
 
     @Test
@@ -854,7 +853,7 @@ public class TestH5P {
         }
         catch (Throwable err) {
             err.printStackTrace();
-            fail("H5Pset_est_link_info: " + err);
+            fail("H5Pset_elink_prefix: " + err);
         }
         assertTrue("H5Pset_elink_prefix", ret_val >= 0);
     }
@@ -1198,25 +1197,90 @@ public class TestH5P {
     }
 
     @Test
-    public void testH5P_file_space() {
+    public void testH5P_file_space_strategy() {
         long[] threshold = {0};
-        int[] strategy = {0};
+        boolean[] persist = {false};
+        int strategy = 0;
         try {
-            H5.H5Pget_file_space(fcpl_id, strategy, threshold);
-            assertTrue("strategy: "+strategy[0], strategy[0] == HDF5Constants.H5F_FILE_SPACE_ALL);
+            strategy = H5.H5Pget_file_space_strategy(fcpl_id, persist, threshold);
+            assertTrue("strategy(default): "+strategy, strategy == HDF5Constants.H5F_FSPACE_STRATEGY_FSM_AGGR);
+            assertTrue("persist(default): "+persist[0], persist[0] == false);
+            assertTrue("theshold(default): "+threshold[0], threshold[0] == 1);
+            H5.H5Pset_file_space_strategy(fcpl_id, HDF5Constants.H5F_FSPACE_STRATEGY_PAGE, true, 1);
+            strategy = H5.H5Pget_file_space_strategy(fcpl_id, persist, threshold);
+            assertTrue("strategy: "+strategy, strategy == HDF5Constants.H5F_FSPACE_STRATEGY_PAGE);
+            assertTrue("persist: "+persist[0], persist[0] == true);
             assertTrue("theshold: "+threshold[0], threshold[0] == 1);
-            H5.H5Pset_file_space(fcpl_id, HDF5Constants.H5F_FILE_SPACE_ALL_PERSIST, 10);
-            H5.H5Pget_file_space(fcpl_id, strategy, threshold);
-            assertTrue("strategy: "+strategy[0], strategy[0] == HDF5Constants.H5F_FILE_SPACE_ALL_PERSIST);
-            assertTrue("theshold: "+threshold[0], threshold[0] == 10);
-            H5.H5Pset_file_space(fcpl_id, HDF5Constants.H5F_FILE_SPACE_VFD, 0);
-            H5.H5Pget_file_space(fcpl_id, strategy, threshold);
-            assertTrue("strategy: "+strategy[0], strategy[0] == HDF5Constants.H5F_FILE_SPACE_VFD);
-            assertTrue("theshold: "+threshold[0], threshold[0] == 10);
         }
         catch (Throwable err) {
             err.printStackTrace();
-            fail("testH5P_file_space: " + err);
+            fail("testH5P_file_space_strategy: " + err);
+        }
+    }
+
+    @Test
+    public void testH5P_file_space_page_size() {
+        long page_size = 0;
+        try {
+            page_size = H5.H5Pget_file_space_page_size(fcpl_id);
+            assertTrue("page_size(default): "+page_size, page_size == 4096);
+            H5.H5Pset_file_space_page_size(fcpl_id, 512);
+            page_size = H5.H5Pget_file_space_page_size(fcpl_id);
+            assertTrue("page_size: "+page_size, page_size == 512);
+        }
+        catch (Throwable err) {
+            err.printStackTrace();
+            fail("testH5P_file_space_page_size: " + err);
         }
    }
+
+    @Test
+    public void testH5Pset_efile_prefix() {
+        String prefix = "tmp";
+        try {
+            H5.H5Pset_efile_prefix(lapl_id, prefix);
+        }
+        catch (Throwable err) {
+            err.printStackTrace();
+            fail("H5Pset_efile_prefix: " + err);
+        }
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testH5Pset_efile_prefix_null() throws Throwable{
+        H5.H5Pset_efile_prefix(lapl_id, null);
+    }
+
+    @Test
+    public void testH5Pget_efile_prefix() {
+        String prefix = "tmp";
+        String pre = "";
+
+        try {
+            H5.H5Pset_efile_prefix(lapl_id, prefix);
+            pre = H5.H5Pget_efile_prefix(lapl_id);
+        }
+        catch (Throwable err) {
+            err.printStackTrace();
+            fail("H5Pget_efile_prefix: " + err);
+        }
+        assertTrue("The prefix: ", prefix.equals(pre));
+    }
+
+    @Ignore
+    public void testH5P_chunk_opts() {
+        int chunk_opts = -1;
+
+        try {
+            chunk_opts = H5.H5Pget_chunk_opts(ocpl_id);
+            assertTrue("chunk_opts: "+chunk_opts, chunk_opts == 0);
+            H5.H5Pset_chunk_opts(ocpl_id, HDF5Constants.H5D_CHUNK_DONT_FILTER_PARTIAL_CHUNKS);
+            chunk_opts = H5.H5Pget_chunk_opts(ocpl_id);
+            assertTrue("chunk_opts: "+chunk_opts, chunk_opts == HDF5Constants.H5D_CHUNK_DONT_FILTER_PARTIAL_CHUNKS);
+        }
+        catch (Throwable err) {
+            err.printStackTrace();
+            fail("H5Pget_lchunk_opts: " + err);
+        }
+    }
 }
