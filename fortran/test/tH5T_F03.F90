@@ -15,12 +15,10 @@
 !                                                                             *
 !   This file is part of HDF5.  The full HDF5 copyright notice, including     *
 !   terms governing use, modification, and redistribution, is contained in    *
-!   the files COPYING and Copyright.html.  COPYING can be found at the root   *
-!   of the source code distribution tree; Copyright.html can be found at the  *
-!   root level of an installed copy of the electronic HDF5 document set and   *
-!   is linked from the top-level documents page.  It can also be found at     *
-!   http://hdfgroup.org/HDF5/doc/Copyright.html.  If you do not have          *
-!   access to either file, you may request a copy from help@hdfgroup.org.     *
+!   the COPYING file, which can be found at the root of the source code       *
+!   distribution tree, or in https://support.hdfgroup.org/ftp/HDF5/releases.  *
+!   If you do not have access to either file, you may request a copy from     *
+!   help@hdfgroup.org.                                                        *
 ! * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 !
 !
@@ -66,6 +64,7 @@ SUBROUTINE test_array_compound_atomic(total_error)
   CHARACTER(LEN=10), PARAMETER :: FILENAME = "tarray1.h5"
 
   TYPE s1_t
+     SEQUENCE
      INTEGER :: i
      REAL :: f
   END TYPE s1_t
@@ -248,7 +247,7 @@ SUBROUTINE test_array_compound_atomic(total_error)
   ! Read dataset from disk 
 
   f_ptr = C_LOC(rdata(1,1))
-  CALL H5Dread_f(dataset, tid1, f_ptr, error)
+  CALL H5Dread_f(dataset, tid1, f_ptr, error, H5S_ALL_F, H5S_ALL_F, H5P_DEFAULT_F)
   CALL check("H5Dread_f", error, total_error)
 
   ! Compare data read in 
@@ -298,7 +297,8 @@ END SUBROUTINE test_array_compound_atomic
     INTEGER, PARAMETER :: SPACE1_DIM1 = 4
     CHARACTER(LEN=10), PARAMETER :: FILENAME = "tarray2.h5"
 
-    TYPE st_t_struct !  Typedef for compound datatype 
+    TYPE st_t_struct !  Typedef for compound datatype
+       SEQUENCE
        INTEGER :: i
        REAL, DIMENSION(1:ARRAY2_DIM1) :: f
        CHARACTER(LEN=2), DIMENSION(1:ARRAY2_DIM1) :: c
@@ -614,15 +614,10 @@ END SUBROUTINE test_array_compound_atomic
              total_error = total_error + 1
           ENDIF
           DO k = 1, ARRAY2_DIM1
-             
-             IF(wdata(i,j)%f(k).NE.rdata(i,j)%f(k))THEN
-                PRINT*, 'ERROR: Wrong real array data is read back by H5Dread_f '
-                total_error = total_error + 1
-             ENDIF
-             IF(wdata(i,j)%c(k).NE.rdata(i,j)%c(k))THEN
-                PRINT*, 'ERROR: Wrong character array data is read back by H5Dread_f '
-                total_error = total_error + 1
-             ENDIF
+             CALL VERIFY("h5dread_f",wdata(i,j)%f(k),rdata(i,j)%f(k),total_error)
+             IF(total_error.NE.0) PRINT*,'ERROR: Wrong real array data is read back by H5Dread_f'
+             CALL VERIFY("h5dread_f",wdata(i,j)%c(k),rdata(i,j)%c(k),total_error) 
+             IF(total_error.NE.0) PRINT*,'ERROR: Wrong character array data is read back by H5Dread_f'
           ENDDO
        ENDDO
     ENDDO
@@ -1054,12 +1049,12 @@ END SUBROUTINE test_array_compound_atomic
     ! Initialize the dset_data array.
     !
     DO i = 1, 4
-       dset_data_i1(i)  = HUGE(0_int_kind_1)-i
-       dset_data_i4(i)  = HUGE(0_int_kind_4)-i
-       dset_data_i8(i)  = HUGE(0_int_kind_8)-i
-       dset_data_i16(i) = HUGE(0_int_kind_16)-i
+       dset_data_i1(i)  = HUGE(0_int_kind_1)-INT(i,int_kind_1)
+       dset_data_i4(i)  = HUGE(0_int_kind_4)-INT(i,int_kind_4)
+       dset_data_i8(i)  = HUGE(0_int_kind_8)-INT(i,int_kind_8)
+       dset_data_i16(i) = HUGE(0_int_kind_16)-INT(i,int_kind_16)
 #if H5_HAVE_Fortran_INTEGER_SIZEOF_16!=0
-       dset_data_i32(i) = HUGE(0_int_kind_32)-i
+       dset_data_i32(i) = HUGE(0_int_kind_32)-INT(i,int_kind_32)
 #endif
        dset_data_r(i) = 4.0*ATAN(1.0)-REAL(i-1)
        dset_data_r7(i) = 4.0_real_kind_7*ATAN(1.0_real_kind_7)-REAL(i-1,real_kind_7)
@@ -1149,33 +1144,33 @@ END SUBROUTINE test_array_compound_atomic
   !
   ! Read data back into an integer size that is larger then the original size used for 
   ! writing the data
-    f_ptr = C_LOC(data_out_i1)
+    f_ptr = C_LOC(data_out_i1(1))
     CALL h5dread_f(dset_id1, h5kind_to_type(int_kind_1,H5_INTEGER_KIND), f_ptr,  error)
     CALL check("h5dread_f",error, total_error)
-    f_ptr = C_LOC(data_out_i4)
+    f_ptr = C_LOC(data_out_i4(1))
     CALL h5dread_f(dset_id4, h5kind_to_type(int_kind_4,H5_INTEGER_KIND), f_ptr,  error)
     CALL check("h5dread_f",error, total_error)
-    f_ptr = C_LOC(data_out_i8)
+    f_ptr = C_LOC(data_out_i8(1))
     CALL h5dread_f(dset_id8, h5kind_to_type(int_kind_8,H5_INTEGER_KIND), f_ptr,  error)
     CALL check("h5dread_f",error, total_error)
-    f_ptr = C_LOC(data_out_i16)
+    f_ptr = C_LOC(data_out_i16(1))
     CALL h5dread_f(dset_id16, h5kind_to_type(int_kind_16,H5_INTEGER_KIND), f_ptr,  error)
     CALL check("h5dread_f",error, total_error)
 #if H5_HAVE_Fortran_INTEGER_SIZEOF_16!=0
-    f_ptr = C_LOC(data_out_i32)
+    f_ptr = C_LOC(data_out_i32(1))
     CALL h5dread_f(dset_id32, h5kind_to_type(int_kind_32,H5_INTEGER_KIND), f_ptr,  error)
     CALL check("h5dread_f",error, total_error)
 #endif
-    f_ptr = C_LOC(data_out_r)
+    f_ptr = C_LOC(data_out_r(1))
     CALL h5dread_f(dset_idr, H5T_NATIVE_REAL, f_ptr,  error)
     CALL check("h5dread_f",error, total_error)
-    f_ptr = C_LOC(data_out_r7)
+    f_ptr = C_LOC(data_out_r7(1))
     CALL h5dread_f(dset_idr4, h5kind_to_type(real_kind_7,H5_REAL_KIND), f_ptr,  error)
     CALL check("h5dread_f",error, total_error)
-    f_ptr = C_LOC(data_out_r15)
+    f_ptr = C_LOC(data_out_r15(1))
     CALL h5dread_f(dset_idr8, h5kind_to_type(real_kind_15,H5_REAL_KIND), f_ptr,  error)
     CALL check("h5dread_f",error, total_error)
-    f_ptr = C_LOC(data_out_r31)
+    f_ptr = C_LOC(data_out_r31(1))
     CALL h5dread_f(dset_idr16, h5kind_to_type(real_kind_31,H5_REAL_KIND), f_ptr,  error)
     CALL check("h5dread_f",error, total_error)
     DO i = 1, 4
@@ -1548,7 +1543,7 @@ SUBROUTINE t_bit(total_error)
   INTEGER :: A, B, C, D
   INTEGER :: Aw, Bw, Cw, Dw
   INTEGER :: i, j
-  INTEGER, PARAMETER :: hex =  Z'00000003'
+  INTEGER, PARAMETER :: hex =  INT(Z'00000003')
   TYPE(C_PTR) :: f_ptr
   INTEGER :: error     ! Error flag
   !
@@ -2005,7 +2000,7 @@ SUBROUTINE t_regref(total_error)
   CALL h5dcreate_f(file,dataset2, H5T_STD_I8LE, space, dset2, error)
   CALL check("h5dcreate_f",error, total_error)
   f_ptr = C_LOC(wdata2(1,1))
-  CALL h5dwrite_f(dset2, H5T_NATIVE_INTEGER_1, f_ptr, error)
+  CALL h5dwrite_f(dset2, H5T_NATIVE_INTEGER_KIND(1), f_ptr, error)
   CALL check("h5dwrite_f",error, total_error)
   !
   ! Create reference to a list of elements in dset2.
@@ -2117,7 +2112,7 @@ SUBROUTINE t_regref(total_error)
      CALL check("h5screate_simple_f",error, total_error)
 
      f_ptr = C_LOC(rdata2(1)(1:1))
-     CALL h5dread_f( dset2, H5T_NATIVE_INTEGER_1, f_ptr, error, memspace, space)
+     CALL h5dread_f( dset2, H5T_NATIVE_INTEGER_KIND(1), f_ptr, error, memspace, space)
      CALL check("H5Dread_f",error, total_error)
      CALL verify("h5dread_f",rdata2(1)(1:npoints),TRIM(chrref_correct(i)), total_error)
 
@@ -2181,13 +2176,13 @@ SUBROUTINE t_vlen(total_error)
   ALLOCATE( ptr(1)%data(1:wdata(1)%len) )
   ALLOCATE( ptr(2)%data(1:wdata(2)%len) )
 
-  DO i=1, wdata(1)%len
-     ptr(1)%data(i) = wdata(1)%len - i + 1 ! 3 2 1
+  DO i=1, INT(wdata(1)%len)
+     ptr(1)%data(i) = INT(wdata(1)%len) - i + 1 ! 3 2 1
   ENDDO
   wdata(1)%p = C_LOC(ptr(1)%data(1))
 
   ptr(2)%data(1:2) = 1
-  DO i = 3, wdata(2)%len
+  DO i = 3, INT(wdata(2)%len)
      ptr(2)%data(i) = ptr(2)%data(i-1) + ptr(2)%data(i-2) ! (1 1 2 3 5 8 etc.)
   ENDDO
   wdata(2)%p = C_LOC(ptr(2)%data(1))
@@ -2273,7 +2268,7 @@ SUBROUTINE t_vlen(total_error)
 
   DO i = 1, INT(dims(1))
      CALL c_f_pointer(rdata(i)%p, ptr_r, [rdata(i)%len] )
-     DO j = 1, rdata(i)%len
+     DO j = 1, INT(rdata(i)%len)
         CALL VERIFY("t_vlen", ptr_r(j), ptr(i)%data(j), total_error)
      ENDDO
   ENDDO
@@ -2891,33 +2886,23 @@ SUBROUTINE setup_buffer(data_in, line_lengths, char_type)
   
   CHARACTER(len=10), DIMENSION(:) :: data_in
   INTEGER(size_t), DIMENSION(:) :: line_lengths
-  INTEGER, DIMENSION(1:3) :: letters
-  CHARACTER(LEN=3) :: lets
+  CHARACTER(LEN=3) :: lets = 'abc'
   CHARACTER(KIND=C_CHAR,LEN=*) :: char_type
-  CHARACTER(KIND=C_CHAR,LEN=1) :: char_tmp
-  INTEGER :: i, j, n, ff
+  INTEGER :: i, j, n
 
-  ! Convert the letters and special character to integers    
-  lets = 'abc'
-  
-  READ(lets,'(3A1)') letters
-  READ(char_type,'(A1)') ff
   n = SIZE(data_in)
   j = 1
   DO i=1,n-1
      IF( j .EQ. 4 )THEN
-        WRITE(char_tmp,'(A1)') ff
-        data_in(i:i) = char_tmp
+        data_in(i:i) = char_type(1:1)
      ELSE
-        WRITE(char_tmp,'(A1)') letters(j)
-        data_in(i:i) = char_tmp
+        data_in(i:i) = lets(j:j)
      ENDIF
      line_lengths(i) = LEN_TRIM(data_in(i))
      j = j + 1
      IF( j .EQ. 5 ) j = 1
   END DO
-  WRITE(char_tmp,'(A1)') ff
-  data_in(n:n) =  char_tmp
+  data_in(n:n) =  char_type(1:1)
   line_lengths(n) = 1
   
 END SUBROUTINE setup_buffer

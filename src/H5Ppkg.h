@@ -5,12 +5,10 @@
  *                                                                           *
  * This file is part of HDF5.  The full HDF5 copyright notice, including     *
  * terms governing use, modification, and redistribution, is contained in    *
- * the files COPYING and Copyright.html.  COPYING can be found at the root   *
- * of the source code distribution tree; Copyright.html can be found at the  *
- * root level of an installed copy of the electronic HDF5 document set and   *
- * is linked from the top-level documents page.  It can also be found at     *
- * http://hdfgroup.org/HDF5/doc/Copyright.html.  If you do not have          *
- * access to either file, you may request a copy from help@hdfgroup.org.     *
+ * the COPYING file, which can be found at the root of the source code       *
+ * distribution tree, or in https://support.hdfgroup.org/ftp/HDF5/releases.  *
+ * If you do not have access to either file, you may request a copy from     *
+ * help@hdfgroup.org.                                                        *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /*
@@ -178,21 +176,21 @@ H5_DLL hid_t H5P__new_plist_of_type(H5P_plist_type_t type);
 
 /* Encode/decode routines */
 H5_DLL herr_t H5P__encode(const H5P_genplist_t *plist, hbool_t enc_all_prop,
-    void *buf, size_t *nalloc);
+    void *buf, size_t *nalloc, hid_t fapl_id);
 H5_DLL hid_t H5P__decode(const void *buf);
-H5_DLL herr_t H5P__encode_hsize_t(const void *value, void **_pp, size_t *size);
-H5_DLL herr_t H5P__encode_size_t(const void *value, void **_pp, size_t *size);
-H5_DLL herr_t H5P__encode_unsigned(const void *value, void **_pp, size_t *size);
-H5_DLL herr_t H5P__encode_uint8_t(const void *value, void **_pp, size_t *size);
-H5_DLL herr_t H5P__encode_hbool_t(const void *value, void **_pp, size_t *size);
-H5_DLL herr_t H5P__encode_double(const void *value, void **_pp, size_t *size);
+H5_DLL herr_t H5P__encode_hsize_t(const void *value, void **_pp, size_t *size, void *udata);
+H5_DLL herr_t H5P__encode_size_t(const void *value, void **_pp, size_t *size, void *udata);
+H5_DLL herr_t H5P__encode_unsigned(const void *value, void **_pp, size_t *size, void *udata);
+H5_DLL herr_t H5P__encode_uint8_t(const void *value, void **_pp, size_t *size, void *udata);
+H5_DLL herr_t H5P__encode_hbool_t(const void *value, void **_pp, size_t *size, void *udata);
+H5_DLL herr_t H5P__encode_double(const void *value, void **_pp, size_t *size, void *udat);
 H5_DLL herr_t H5P__decode_hsize_t(const void **_pp, void *value);
 H5_DLL herr_t H5P__decode_size_t(const void **_pp, void *value);
 H5_DLL herr_t H5P__decode_unsigned(const void **_pp, void *value);
 H5_DLL herr_t H5P__decode_uint8_t(const void **_pp, void *value);
 H5_DLL herr_t H5P__decode_hbool_t(const void **_pp, void *value);
 H5_DLL herr_t H5P__decode_double(const void **_pp, void *value);
-H5_DLL herr_t H5P__encode_coll_md_read_flag_t(const void *value, void **_pp, size_t *size);
+H5_DLL herr_t H5P__encode_coll_md_read_flag_t(const void *value, void **_pp, size_t *size, void *udata);
 H5_DLL herr_t H5P__decode_coll_md_read_flag_t(const void **_pp, void *value);
 
 /* Private OCPL routines */
@@ -204,8 +202,6 @@ H5_DLL herr_t H5P_get_filter(const struct H5Z_filter_info_t *filter,
 #ifdef H5P_TESTING
 H5_DLL char *H5P_get_class_path_test(hid_t pclass_id);
 H5_DLL hid_t H5P_open_class_path_test(const char *path);
-H5_DLL herr_t H5P_reset_external_file_test(hid_t dcpl_id);
-H5_DLL herr_t H5P_reset_layout_test(hid_t dcpl_id);
 #endif /* H5P_TESTING */
 
 #endif /* _H5Ppkg_H */

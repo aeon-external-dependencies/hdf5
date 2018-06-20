@@ -5,12 +5,10 @@
  *                                                                           *
  * This file is part of HDF5.  The full HDF5 copyright notice, including     *
  * terms governing use, modification, and redistribution, is contained in    *
- * the files COPYING and Copyright.html.  COPYING can be found at the root   *
- * of the source code distribution tree; Copyright.html can be found at the  *
- * root level of an installed copy of the electronic HDF5 document set and   *
- * is linked from the top-level documents page.  It can also be found at     *
- * http://hdfgroup.org/HDF5/doc/Copyright.html.  If you do not have          *
- * access to either file, you may request a copy from help@hdfgroup.org.     *
+ * the COPYING file, which can be found at the root of the source code       *
+ * distribution tree, or in https://support.hdfgroup.org/ftp/HDF5/releases.  *
+ * If you do not have access to either file, you may request a copy from     *
+ * help@hdfgroup.org.                                                        *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /*
@@ -489,7 +487,7 @@ H5FD_direct_open(const char *name, unsigned flags, hid_t fapl_id, haddr_t maxadd
     o_flags |= O_DIRECT;
 
     /* Open the file */
-    if ((fd=HDopen(name, o_flags, 0666))<0)
+    if ((fd = HDopen(name, o_flags, H5_POSIX_CREATE_MODE_RW))<0)
         HSYS_GOTO_ERROR(H5E_FILE, H5E_CANTOPENFILE, NULL, "unable to open file")
 
     if (HDfstat(fd, &sb)<0)
@@ -525,6 +523,9 @@ H5FD_direct_open(const char *name, unsigned flags, hid_t fapl_id, haddr_t maxadd
     /* Try to decide if data alignment is required.  The reason to check it here
      * is to handle correctly the case that the file is in a different file system
      * than the one where the program is running.
+     */
+    /* NOTE: Use HDmalloc and HDfree here to ensure compatibility with
+     *       HDposix_memalign.
      */
     buf1 = (int *)HDmalloc(sizeof(int));
     if(HDposix_memalign(&buf2, file->fa.mboundary, file->fa.fbsize) != 0)
@@ -697,7 +698,7 @@ H5FD_direct_query(const H5FD_t H5_ATTR_UNUSED * _f, unsigned long *flags /* out 
         *flags |= H5FD_FEAT_ACCUMULATE_METADATA;    /* OK to accumulate metadata for faster writes                      */
         *flags |= H5FD_FEAT_DATA_SIEVE;             /* OK to perform data sieving for faster raw data reads & writes    */
         *flags |= H5FD_FEAT_AGGREGATE_SMALLDATA;    /* OK to aggregate "small" raw data allocations                     */
-        *flags |= H5FD_FEAT_SUPPORTS_SWMR_IO;       /* VFD supports the single-writer/multiple-readers (SWMR) pattern   */
+        *flags |= H5FD_FEAT_DEFAULT_VFD_COMPATIBLE; /* VFD creates a file which can be opened with the default VFD      */
     }
 
     FUNC_LEAVE_NOAPI(SUCCEED)
@@ -993,6 +994,7 @@ H5FD_direct_read(H5FD_t *_file, H5FD_mem_t H5_ATTR_UNUSED type, hid_t H5_ATTR_UN
       addr = (haddr_t)(((addr + size - 1) / _fbsize + 1) * _fbsize);
 
       if(copy_buf) {
+                /* Free with HDfree since it came from posix_memalign */
                 HDfree(copy_buf);
                 copy_buf = NULL;
             } /* end if */
@@ -1004,6 +1006,7 @@ H5FD_direct_read(H5FD_t *_file, H5FD_mem_t H5_ATTR_UNUSED type, hid_t H5_ATTR_UN
 
 done:
     if(ret_value<0) {
+        /* Free with HDfree since it came from posix_memalign */
         if(copy_buf)
             HDfree(copy_buf);
 
@@ -1224,6 +1227,7 @@ H5FD_direct_write(H5FD_t *_file, H5FD_mem_t H5_ATTR_UNUSED type, hid_t H5_ATTR_U
   buf = (const char*)buf + size;
 
   if(copy_buf) {
+    /* Free with HDfree since it came from posix_memalign */
       HDfree(copy_buf);
       copy_buf = NULL;
         } /* end if */
@@ -1237,6 +1241,7 @@ H5FD_direct_write(H5FD_t *_file, H5FD_mem_t H5_ATTR_UNUSED type, hid_t H5_ATTR_U
 
 done:
     if(ret_value<0) {
+        /* Free with HDfree since it came from posix_memalign */
         if(copy_buf)
             HDfree(copy_buf);
 

@@ -14,12 +14,10 @@
 !                                                                             *
 !   This file is part of HDF5.  The full HDF5 copyright notice, including     *
 !   terms governing use, modification, and redistribution, is contained in    *
-!   the files COPYING and Copyright.html.  COPYING can be found at the root   *
-!   of the source code distribution tree; Copyright.html can be found at the  *
-!   root level of an installed copy of the electronic HDF5 document set and   *
-!   is linked from the top-level documents page.  It can also be found at     *
-!   http://hdfgroup.org/HDF5/doc/Copyright.html.  If you do not have          *
-!   access to either file, you may request a copy from help@hdfgroup.org.     *
+!   the COPYING file, which can be found at the root of the source code       *
+!   distribution tree, or in https://support.hdfgroup.org/ftp/HDF5/releases.  *
+!   If you do not have access to either file, you may request a copy from     *
+!   help@hdfgroup.org.                                                        *
 ! * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 !
 ! NOTES
@@ -5315,7 +5313,7 @@ CONTAINS
 !  
 !  expression - buffer to hold transform expression
 !  hdferr     - Error code
-!                 Success:  Actual lenght of the expression
+!                 Success:  Actual length of the expression
 !                           If provided buffer "expression" is 
 !                           smaller, than expression will be 
 !                           truncated to fit into
@@ -6260,11 +6258,11 @@ SUBROUTINE h5pset_attr_phase_change_f(ocpl_id, max_compact, min_dense, hdferr)
     INTEGER(HID_T), INTENT(IN) :: type_id ! Datatype identifier of
                                           ! of fillvalue datatype
                                           ! (in memory)
-    CHARACTER, INTENT(IN), TARGET :: fillvalue ! Fillvalue
+    CHARACTER(LEN=1), INTENT(IN), TARGET :: fillvalue ! Fillvalue
     INTEGER, INTENT(OUT) :: hdferr             ! Error code
     TYPE(C_PTR) :: f_ptr                       ! C address
 
-    f_ptr = C_LOC(fillvalue)
+    f_ptr = C_LOC(fillvalue(1:1))
     hdferr = h5pset_fill_value_c(prp_id, type_id, f_ptr)
 
   END SUBROUTINE h5pset_fill_value_char
@@ -6275,7 +6273,7 @@ SUBROUTINE h5pset_attr_phase_change_f(ocpl_id, max_compact, min_dense, hdferr)
     INTEGER(HID_T), INTENT(IN) :: type_id ! Datatype identifier of
                                           ! of fillvalue datatype
                                           ! (in memory)
-    CHARACTER, INTENT(OUT) :: fillvalue   ! Fillvalue
+    CHARACTER(LEN=*), INTENT(OUT) :: fillvalue   ! Fillvalue
     INTEGER, INTENT(OUT) :: hdferr        ! Error code
 
     INTEGER :: i
@@ -6286,7 +6284,7 @@ SUBROUTINE h5pset_attr_phase_change_f(ocpl_id, max_compact, min_dense, hdferr)
     ! To resolve Issue #1 outlined in the preamble of this file we
     ! need to pack the character string into an array.
 
-    chr_len = LEN(fillvalue)
+    chr_len = LEN(fillvalue(1:1))
     ALLOCATE(chr(1:chr_len), STAT=hdferr)
     IF (hdferr .NE. 0) THEN
        hdferr = -1
@@ -6397,18 +6395,18 @@ SUBROUTINE h5pset_attr_phase_change_f(ocpl_id, max_compact, min_dense, hdferr)
 !!  SUBROUTINE h5pget_fill_value_f(prp_id, type_id, fillvalue, hdferr)
 !!    INTEGER(HID_T), INTENT(IN)  :: prp_id 
 !!    INTEGER(HID_T), INTENT(IN)  :: type_id
-!!    TYPE(C_PTR)   , INTENT(OUT) :: fillvalue
+!!    TYPE(C_PTR)                 :: fillvalue
 !!    INTEGER       , INTENT(OUT) :: hdferr
 !*****
 
   SUBROUTINE h5pget_fill_value_ptr(prp_id, type_id, fillvalue, hdferr)
     IMPLICIT NONE
-    INTEGER(HID_T), INTENT(IN) :: prp_id  ! Property list identifier
-    INTEGER(HID_T), INTENT(IN) :: type_id ! Datatype identifier of
-                                          ! of fillvalue datatype
-                                          ! (in memory)
-    TYPE(C_PTR), INTENT(OUT) :: fillvalue ! Fillvalue
-    INTEGER, INTENT(OUT) :: hdferr        ! Error code
+    INTEGER(HID_T), INTENT(IN)  :: prp_id    ! Property list identifier
+    INTEGER(HID_T), INTENT(IN)  :: type_id   ! Datatype identifier of
+                                             ! of fillvalue datatype
+                                             ! (in memory)
+    TYPE(C_PTR)                 :: fillvalue ! Fillvalue
+    INTEGER       , INTENT(OUT) :: hdferr    ! Error code
 
     hdferr = h5pget_fill_value_c(prp_id, type_id, fillvalue)
 

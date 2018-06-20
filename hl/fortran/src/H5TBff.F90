@@ -5,12 +5,10 @@
 !                                                                             *
 !   This file is part of HDF5.  The full HDF5 copyright notice, including     *
 !   terms governing use, modification, and redistribution, is contained in    *
-!   the files COPYING and Copyright.html.  COPYING can be found at the root   *
-!   of the source code distribution tree; Copyright.html can be found at the  *
-!   root level of an installed copy of the electronic HDF5 document set and   *
-!   is linked from the top-level documents page.  It can also be found at     *
-!   http://hdfgroup.org/HDF5/doc/Copyright.html.  If you do not have          *
-!   access to either file, you may request a copy from help@hdfgroup.org.     *
+!   the COPYING file, which can be found at the root of the source code       *
+!   distribution tree, or in https://support.hdfgroup.org/ftp/HDF5/releases.  *
+!   If you do not have access to either file, you may request a copy from     *
+!   help@hdfgroup.org.                                                        *
 ! * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 !
 !
@@ -61,6 +59,11 @@ MODULE h5tb_CONST
   INTERFACE h5tbinsert_field_f
      MODULE PROCEDURE h5tbinsert_field_f_int
      MODULE PROCEDURE h5tbinsert_field_f_string
+  END INTERFACE
+
+  INTERFACE h5tbmake_table_f
+     MODULE PROCEDURE h5tbmake_table_f90
+     MODULE PROCEDURE h5tbmake_table_ptr_f
   END INTERFACE
 
   INTERFACE
@@ -163,7 +166,7 @@ MODULE h5tb_CONST
 CONTAINS
 
 !-------------------------------------------------------------------------
-! Function: h5tbmake_table_f
+! Function: h5tbmake_table_f90
 !
 ! Purpose: Make a table
 !
@@ -179,7 +182,7 @@ CONTAINS
 !
 !-------------------------------------------------------------------------
 
-  SUBROUTINE h5tbmake_table_f(table_title,&
+  SUBROUTINE h5tbmake_table_f90(table_title,&
        loc_id,&
        dset_name,&
        nfields,&
@@ -259,23 +262,162 @@ CONTAINS
     
     max_char_size_field_names = LEN(field_names(1)) 
 
-    errcode = h5tbmake_table_c(namelen1,&
-         table_title,&
-         loc_id,&
-         namelen,&
-         dset_name,&
-         nfields,&
-         nrecords,&
-         type_size,&
-         field_offset,&
-         field_types,&
-         chunk_size,&
-         compress,&
-         char_len_field_names, &
-         max_char_size_field_names, &
-         field_names)
+    errcode = h5tbmake_table_c(namelen1, table_title, loc_id, namelen, dset_name, nfields, nrecords,&
+         type_size, field_offset, field_types, chunk_size, compress, char_len_field_names, &
+         max_char_size_field_names, field_names)
 
-  END SUBROUTINE h5tbmake_table_f
+  END SUBROUTINE h5tbmake_table_f90
+
+  SUBROUTINE h5tbmake_table_ptr_f(table_title,&
+       loc_id,&
+       dset_name,&
+       nfields,&
+       nrecords,&
+       type_size,&
+       field_names,&
+       field_offset,&
+       field_types,&
+       chunk_size,&
+       fill_data,&
+       compress,&
+       data,&
+       errcode )
+
+    USE ISO_C_BINDING
+    IMPLICIT NONE
+    CHARACTER(LEN=*), INTENT(in) :: table_title                      ! name of the dataset
+    INTEGER(hid_t),   INTENT(in) :: loc_id                           ! file or group identifier
+    CHARACTER(LEN=*), INTENT(in) :: dset_name                        ! name of the dataset
+    INTEGER(hsize_t), INTENT(in) :: nfields                          ! fields
+    INTEGER(hsize_t), INTENT(in) :: nrecords                         ! records
+    INTEGER(size_t),  INTENT(in) :: type_size                        ! type size
+    CHARACTER(LEN=*), DIMENSION(1:nfields), INTENT(in) :: field_names  ! field names
+    INTEGER(size_t),  DIMENSION(1:nfields), INTENT(in) :: field_offset ! field offset
+    INTEGER(hid_t),   DIMENSION(1:nfields), INTENT(in) :: field_types  ! field types
+    INTEGER(hsize_t), INTENT(in) :: chunk_size                       ! chunk size
+    TYPE(C_PTR), INTENT(in) :: fill_data                             ! Fill values data
+    INTEGER,          INTENT(in) :: compress                         ! compress
+    TYPE(C_PTR), INTENT(in) :: data                                  ! Buffer with data to be written to the table
+    INTEGER(size_t) :: namelen                                       ! name length
+    INTEGER(size_t) :: namelen1                                      ! name length
+    INTEGER :: errcode                                               ! error code
+    INTEGER(size_t), DIMENSION(1:nfields) :: char_len_field_names    ! field name lengths
+    INTEGER(size_t) :: max_char_size_field_names                     ! character len of field names
+    INTEGER(hsize_t) :: i                                            ! general purpose integer
+
+    INTERFACE
+       INTEGER FUNCTION h5tbmake_table_ptr_c(namelen1,&
+            table_title,&
+            loc_id,&
+            namelen,&
+            dset_name,&
+            nfields,&
+            nrecords,&
+            type_size,&
+            field_offset,&
+            field_types,&
+            chunk_size,&
+            fill_data,&
+            compress,&
+            char_len_field_names,&
+            max_char_size_field_names,&
+            field_names,&
+            data) &
+            BIND(C,NAME='h5tbmake_table_ptr_c')
+         IMPORT :: C_CHAR, C_PTR
+         IMPORT :: HID_T, SIZE_T, HSIZE_T
+         IMPLICIT NONE
+         CHARACTER(KIND=C_CHAR), DIMENSION(*), INTENT(in) :: table_title  ! name of the dataset
+         INTEGER(hid_t),   INTENT(in) :: loc_id                           ! file or group identifier
+         CHARACTER(KIND=C_CHAR), DIMENSION(*), INTENT(in) :: dset_name    ! name of the dataset
+         INTEGER(hsize_t), INTENT(in) :: nfields                          ! fields
+         INTEGER(hsize_t), INTENT(in) :: nrecords                         ! records
+         INTEGER(size_t),  INTENT(in) :: type_size                        ! type size
+         CHARACTER(KIND=C_CHAR), DIMENSION(nfields), INTENT(in) :: field_names  ! field names
+         INTEGER(size_t),  DIMENSION(nfields), INTENT(in) :: field_offset ! field offset
+         INTEGER(hid_t),   DIMENSION(nfields), INTENT(in) :: field_types  ! field types
+         INTEGER(hsize_t), INTENT(in) :: chunk_size                       ! chunk size
+         TYPE(C_PTR), INTENT(in), VALUE :: fill_data                      ! Fill values data
+         INTEGER,          INTENT(in) :: compress                         ! compress
+         INTEGER(size_t) :: namelen                                       ! name length
+         INTEGER(size_t) :: namelen1                                      ! name length
+         INTEGER(size_t), DIMENSION(nfields) :: char_len_field_names      ! field name's lengths
+         INTEGER(size_t) :: max_char_size_field_names                     ! character len of field names
+         TYPE(C_PTR), INTENT(in), VALUE :: data
+       END FUNCTION h5tbmake_table_ptr_c
+    END INTERFACE
+ 
+    namelen  = LEN(dset_name)
+    namelen1 = LEN(table_title)
+ 
+    ! Find the size of each character string in the array
+    DO i = 1, nfields
+       char_len_field_names(i) = LEN_TRIM(field_names(i))
+    END DO
+    
+    max_char_size_field_names = LEN(field_names(1)) 
+
+    errcode = h5tbmake_table_ptr_c(namelen1, table_title, loc_id, namelen, dset_name, nfields, nrecords,&
+         type_size, field_offset, field_types, chunk_size, fill_data, compress, char_len_field_names, &
+         max_char_size_field_names, field_names, data)
+
+  END SUBROUTINE h5tbmake_table_ptr_f
+
+  SUBROUTINE h5tbread_table_f(loc_id, table_name, nfields, dst_size, dst_offset, &
+       dst_sizes, dst_buf, errcode)
+
+    USE ISO_C_BINDING
+    IMPLICIT NONE
+    INTEGER(hid_t),   INTENT(in) :: loc_id                            ! An array containing the sizes of the fields
+    CHARACTER(LEN=*), INTENT(in) :: table_name                        ! The name of the dataset to read
+    INTEGER(hsize_t), INTENT(in) :: nfields                           ! number of fields
+    INTEGER(size_t),  INTENT(in) :: dst_size                          ! The size of the structure type
+    INTEGER(size_t),  DIMENSION(1:nfields), INTENT(in) :: dst_offset  ! An array containing the offsets of the fields
+    INTEGER(size_t),  DIMENSION(1:nfields), INTENT(in) :: dst_sizes   ! An array containing the sizes of the fields
+    TYPE(C_PTR)                                        :: dst_buf     ! Buffer with data !! do not use INTENT, causes NAG
+                                                                      ! to segfault in C APIs
+    INTEGER :: errcode                                                ! error code
+
+    INTEGER(size_t) :: namelen                                        ! name length
+
+    INTERFACE
+       INTEGER FUNCTION h5tbread_table_c(loc_id,&
+            table_name,&
+            namelen,&
+            nfields,&
+            dst_size,&
+            dst_offset, &
+            dst_sizes, &
+            dst_buf) &
+            BIND(C,NAME='h5tbread_table_c')
+         IMPORT :: C_PTR
+         IMPORT :: HID_T, SIZE_T, HSIZE_T
+         IMPLICIT NONE
+         INTEGER(hid_t),   INTENT(in) :: loc_id                    ! file or group identifier
+         CHARACTER(LEN=1), INTENT(in) :: table_name                ! name of the dataset
+         INTEGER(hsize_t), INTENT(in) :: nfields 
+         INTEGER(size_t),  INTENT(in) :: dst_size                  ! type size
+         INTEGER(size_t),  DIMENSION(1:nfields), INTENT(in) :: dst_offset  ! An array containing the sizes of the fields
+         INTEGER(size_t),  DIMENSION(1:nfields), INTENT(in) :: dst_sizes   ! An array containing the sizes of the fields
+         INTEGER(size_t) :: namelen                                ! name length
+         TYPE(C_PTR), VALUE :: dst_buf
+
+       END FUNCTION h5tbread_table_c
+    END INTERFACE
+ 
+    namelen = LEN(table_name)
+
+    errcode = h5tbread_table_c(loc_id,&
+         table_name,&
+         namelen, &
+         nfields, &
+         dst_size,&
+         dst_offset, &
+         dst_sizes, &
+         dst_buf)
+
+
+  END SUBROUTINE h5tbread_table_f
 
 !-------------------------------------------------------------------------
 ! Function: h5tbwrite_field_name_f_int

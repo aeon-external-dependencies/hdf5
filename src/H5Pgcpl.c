@@ -5,12 +5,10 @@
  *                                                                           *
  * This file is part of HDF5.  The full HDF5 copyright notice, including     *
  * terms governing use, modification, and redistribution, is contained in    *
- * the files COPYING and Copyright.html.  COPYING can be found at the root   *
- * of the source code distribution tree; Copyright.html can be found at the  *
- * root level of an installed copy of the electronic HDF5 document set and   *
- * is linked from the top-level documents page.  It can also be found at     *
- * http://hdfgroup.org/HDF5/doc/Copyright.html.  If you do not have          *
- * access to either file, you may request a copy from help@hdfgroup.org.     *
+ * the COPYING file, which can be found at the root of the source code       *
+ * distribution tree, or in https://support.hdfgroup.org/ftp/HDF5/releases.  *
+ * If you do not have access to either file, you may request a copy from     *
+ * help@hdfgroup.org.                                                        *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /*-------------------------------------------------------------------------
@@ -71,9 +69,9 @@
 static herr_t H5P__gcrt_reg_prop(H5P_genclass_t *pclass);
 
 /* Property callbacks */
-static herr_t H5P__gcrt_group_info_enc(const void *value, void **_pp, size_t *size);
+static herr_t H5P__gcrt_group_info_enc(const void *value, void **_pp, size_t *size, void *udata);
 static herr_t H5P__gcrt_group_info_dec(const void **_pp, void *value);
-static herr_t H5P__gcrt_link_info_enc(const void *value, void **_pp, size_t *size);
+static herr_t H5P__gcrt_link_info_enc(const void *value, void **_pp, size_t *size, void *udata);
 static herr_t H5P__gcrt_link_info_dec(const void **_pp, void *value);
 
 
@@ -548,7 +546,7 @@ done:
  *-------------------------------------------------------------------------
  */
 static herr_t 
-H5P__gcrt_group_info_enc(const void *value, void **_pp, size_t *size)
+H5P__gcrt_group_info_enc(const void *value, void **_pp, size_t *size, void H5_ATTR_UNUSED *udata)
 {
     const H5O_ginfo_t *ginfo = (const H5O_ginfo_t *)value; /* Create local aliases for values */
     uint8_t **pp = (uint8_t **)_pp;
@@ -636,7 +634,7 @@ H5P__gcrt_group_info_dec(const void **_pp, void *_value)
  *-------------------------------------------------------------------------
  */
 static herr_t 
-H5P__gcrt_link_info_enc(const void *value, void **_pp, size_t *size)
+H5P__gcrt_link_info_enc(const void *value, void **_pp, size_t *size, void H5_ATTR_UNUSED *udata)
 {
     const H5O_linfo_t *linfo = (const H5O_linfo_t *)value; /* Create local aliases for values */
     uint8_t **pp = (uint8_t **)_pp;

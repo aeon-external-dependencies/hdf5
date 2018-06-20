@@ -5,12 +5,10 @@
  *                                                                           *
  * This file is part of HDF5.  The full HDF5 copyright notice, including     *
  * terms governing use, modification, and redistribution, is contained in    *
- * the files COPYING and Copyright.html.  COPYING can be found at the root   *
- * of the source code distribution tree; Copyright.html can be found at the  *
- * root level of an installed copy of the electronic HDF5 document set and   *
- * is linked from the top-level documents page.  It can also be found at     *
- * http://hdfgroup.org/HDF5/doc/Copyright.html.  If you do not have          *
- * access to either file, you may request a copy from help@hdfgroup.org.     *
+ * the COPYING file, which can be found at the root of the source code       *
+ * distribution tree, or in https://support.hdfgroup.org/ftp/HDF5/releases.  *
+ * If you do not have access to either file, you may request a copy from     *
+ * help@hdfgroup.org.                                                        *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /* Programmer:  Robb Matzke <matzke@llnl.gov>
@@ -55,7 +53,6 @@
 #   include <limits.h>
 #   include <math.h>
 #   include <signal.h>
-#   include <stdarg.h>
 #   include <stdio.h>
 #   include <stdlib.h>
 #   include <string.h>
@@ -497,6 +494,15 @@
 #   define H5_POSIX_MAX_IO_BYTES        SSIZET_MAX
 #endif
 
+/* POSIX I/O mode used as the third parameter to open/_open
+ * when creating a new file (O_CREAT is set).
+ */
+#if defined(H5_HAVE_WIN32_API)
+#   define H5_POSIX_CREATE_MODE_RW      (_S_IREAD | _S_IWRITE)
+#else
+#   define H5_POSIX_CREATE_MODE_RW      0666
+#endif
+
 /*
  * A macro to portably increment enumerated types.
  */
@@ -657,6 +663,9 @@ typedef struct {
 #ifndef HDatol
     #define HDatol(S)    atol(S)
 #endif /* HDatol */
+#ifndef HDatoll
+    #define HDatoll(S)   atoll(S)
+#endif /* HDatol */
 #ifndef HDbsearch
     #define HDbsearch(K,B,N,Z,F)  bsearch(K,B,N,Z,F)
 #endif /* HDbsearch */
@@ -810,7 +819,8 @@ H5_DLL H5_ATTR_CONST int Nflock(int fd, int operation);
     /* NOTE: flock(2) is not present on all POSIX systems.
      * If it is not present, we try a flock() equivalent based on
      * fcntl(2), then fall back to a function that always fails if
-     * it is not present at all.
+     * it is not present at all (Windows uses a separate Wflock()
+     * function).
      */
     #if defined(H5_HAVE_FLOCK)
         #define HDflock(F,L)    flock(F,L)
@@ -1029,6 +1039,15 @@ typedef off_t               h5_stat_size_t;
 #ifndef HDlink
     #define HDlink(OLD,NEW)    link(OLD,NEW)
 #endif /* HDlink */
+#ifndef HDllround
+    #define HDllround(V)     llround(V)
+#endif /* HDround */
+#ifndef HDllroundf
+    #define HDllroundf(V)    llroundf(V)
+#endif /* HDllroundf */
+#ifndef HDllroundl
+    #define HDllroundl(V)    llroundl(V)
+#endif /* HDllroundl */
 #ifndef HDlocaleconv
     #define HDlocaleconv()    localeconv()
 #endif /* HDlocaleconv */
@@ -1044,6 +1063,15 @@ typedef off_t               h5_stat_size_t;
 #ifndef HDlongjmp
     #define HDlongjmp(J,N)    longjmp(J,N)
 #endif /* HDlongjmp */
+#ifndef HDlround
+    #define HDlround(V)     lround(V)
+#endif /* HDround */
+#ifndef HDlroundf
+    #define HDlroundf(V)    lroundf(V)
+#endif /* HDlroundf */
+#ifndef HDlroundl
+    #define HDlroundl(V)    lroundl(V)
+#endif /* HDroundl */
 #ifndef HDlseek
     #define HDlseek(F,O,W)  lseek(F,O,W)
 #endif /* HDlseek */
@@ -1093,12 +1121,11 @@ typedef off_t               h5_stat_size_t;
 #ifndef HDmodf
     #define HDmodf(X,Y)    modf(X,Y)
 #endif /* HDmodf */
+#ifndef HDnanosleep
+    #define HDnanosleep(N, O)    nanosleep(N, O)
+#endif /* HDnanosleep */
 #ifndef HDopen
-    #ifdef _O_BINARY
-        #define HDopen(S,F,M)    open(S,F|_O_BINARY,M)
-    #else
-        #define HDopen(S,F,M)    open(S,F,M)
-    #endif
+    #define HDopen(F,...)    open(F,__VA_ARGS__)
 #endif /* HDopen */
 #ifndef HDopendir
     #define HDopendir(S)    opendir(S)
@@ -1118,7 +1145,12 @@ typedef off_t               h5_stat_size_t;
 #ifndef HDpow
     #define HDpow(X,Y)    pow(X,Y)
 #endif /* HDpow */
-/* printf() variable arguments */
+#ifndef HDpowf
+    #define HDpowf(X,Y)   powf(X,Y)
+#endif /* HDpowf */
+#ifndef HDprintf
+    #define HDprintf(...)   HDfprintf(stdout, __VA_ARGS__)
+#endif /* HDprintf */
 #ifndef HDputc
     #define HDputc(C,F)    putc(C,F)
 #endif /* HDputc*/
@@ -1180,6 +1212,15 @@ typedef off_t               h5_stat_size_t;
 #ifndef HDrewinddir
     #define HDrewinddir(D)    rewinddir(D)
 #endif /* HDrewinddir */
+#ifndef HDround
+    #define HDround(V)    round(V)
+#endif /* HDround */
+#ifndef HDroundf
+    #define HDroundf(V)    roundf(V)
+#endif /* HDroundf */
+#ifndef HDroundl
+    #define HDroundl(V)    roundl(V)
+#endif /* HDroundl */
 #ifndef HDrmdir
     #define HDrmdir(S)    rmdir(S)
 #endif /* HDrmdir */
@@ -1347,7 +1388,13 @@ typedef off_t               h5_stat_size_t;
 #ifndef HDstrtol
     #define HDstrtol(S,R,N)    strtol(S,R,N)
 #endif /* HDstrtol */
-H5_DLL int64_t HDstrtoll (const char *s, const char **rest, int base);
+#ifndef HDstrtoll
+    #ifdef H5_HAVE_STRTOLL
+        #define HDstrtoll(S,R,N)  strtoll(S,R,N)
+    #else
+        H5_DLL int64_t HDstrtoll (const char *s, const char **rest, int base);
+    #endif /* H5_HAVE_STRTOLL */
+#endif /* HDstrtoll */
 #ifndef HDstrtoul
     #define HDstrtoul(S,R,N)  strtoul(S,R,N)
 #endif /* HDstrtoul */
@@ -1515,7 +1562,7 @@ extern char *strdup(const char *s);
 #define H5_CHECK_OVERFLOW(var, vartype, casttype) \
 {                                                 \
     casttype _tmp_overflow = (casttype)(var);     \
-    assert((var) == (vartype)_tmp_overflow);      \
+    HDassert((var) == (vartype)_tmp_overflow);      \
 }
 #else /* NDEBUG */
 #define H5_CHECK_OVERFLOW(var, vartype, casttype)
@@ -1529,7 +1576,7 @@ extern char *strdup(const char *s);
 {                                                       \
     srctype _tmp_src = (srctype)(src);  \
     dsttype _tmp_dst = (dsttype)(_tmp_src);  \
-    assert(_tmp_src == (srctype)_tmp_dst);   \
+    HDassert(_tmp_src == (srctype)_tmp_dst);   \
     (dst) = _tmp_dst;                             \
 }
 
@@ -1540,8 +1587,8 @@ extern char *strdup(const char *s);
 {                                                       \
     srctype _tmp_src = (srctype)(src);  \
     dsttype _tmp_dst = (dsttype)(_tmp_src);  \
-    assert(_tmp_src >= 0);   \
-    assert(_tmp_src == _tmp_dst);   \
+    HDassert(_tmp_src >= 0);   \
+    HDassert(_tmp_src == _tmp_dst);   \
     (dst) = _tmp_dst;                             \
 }
 
@@ -1552,8 +1599,8 @@ extern char *strdup(const char *s);
 {                                                       \
     srctype _tmp_src = (srctype)(src);  \
     dsttype _tmp_dst = (dsttype)(_tmp_src);  \
-    assert(_tmp_dst >= 0);   \
-    assert(_tmp_src == (srctype)_tmp_dst);   \
+    HDassert(_tmp_dst >= 0);   \
+    HDassert(_tmp_src == (srctype)_tmp_dst);   \
     (dst) = _tmp_dst;                             \
 }
 
@@ -1561,8 +1608,8 @@ extern char *strdup(const char *s);
 {                                                       \
     srctype _tmp_src = (srctype)(src);  \
     dsttype _tmp_dst = (dsttype)(_tmp_src);  \
-    assert(_tmp_src >= 0);   \
-    assert(_tmp_src == (srctype)_tmp_dst);   \
+    HDassert(_tmp_src >= 0);   \
+    HDassert(_tmp_src == (srctype)_tmp_dst);   \
     (dst) = _tmp_dst;                             \
 }
 
@@ -1640,25 +1687,25 @@ extern char *strdup(const char *s);
  *    information about the package in H5_init_library().
  */
 typedef enum {
-    H5_PKG_A,        /*Attributes      */
-    H5_PKG_AC,        /*Meta data cache    */
-    H5_PKG_B,        /*B-trees      */
-    H5_PKG_D,        /*Datasets      */
-    H5_PKG_E,        /*Error handling    */
-    H5_PKG_F,        /*Files        */
-    H5_PKG_G,        /*Groups      */
-    H5_PKG_HG,        /*Global heap      */
-    H5_PKG_HL,        /*Local heap      */
-    H5_PKG_I,        /*Interface      */
-    H5_PKG_MF,        /*File memory management  */
-    H5_PKG_MM,        /*Core memory management  */
-    H5_PKG_O,        /*Object headers    */
-    H5_PKG_P,        /*Property lists    */
-    H5_PKG_S,        /*Data spaces      */
-    H5_PKG_T,        /*Data types      */
-    H5_PKG_V,        /*Vector functions    */
-    H5_PKG_Z,        /*Raw data filters    */
-    H5_NPKGS        /*Must be last      */
+    H5_PKG_A,       /* Attributes               */
+    H5_PKG_AC,      /* Metadata cache           */
+    H5_PKG_B,       /* B-trees                  */
+    H5_PKG_D,       /* Datasets                 */
+    H5_PKG_E,       /* Error handling           */
+    H5_PKG_F,       /* Files                    */
+    H5_PKG_G,       /* Groups                   */
+    H5_PKG_HG,      /* Global heaps             */
+    H5_PKG_HL,      /* Local heaps              */
+    H5_PKG_I,       /* IDs                      */
+    H5_PKG_MF,      /* File memory management   */
+    H5_PKG_MM,      /* Core memory management   */
+    H5_PKG_O,       /* Object headers           */
+    H5_PKG_P,       /* Property lists           */
+    H5_PKG_S,       /* Dataspaces               */
+    H5_PKG_T,       /* Datatypes                */
+    H5_PKG_V,       /* Vector functions         */
+    H5_PKG_Z,       /* Raw data filters         */
+    H5_NPKGS        /* Must be last             */
 } H5_pkg_t;
 
 typedef struct H5_debug_open_stream_t {
@@ -1687,76 +1734,90 @@ extern H5_debug_t    H5_debug_g;
 extern char H5libhdf5_settings[]; /* embedded library information */
 
 /*-------------------------------------------------------------------------
- * Purpose:  These macros are inserted automatically just after the
- *    FUNC_ENTER() macro of API functions and are used to trace
- *    application program execution. Unless H5_DEBUG_API has been
- *    defined they are no-ops.
+ * Purpose: These macros are inserted automatically just after the
+ *          FUNC_ENTER() macro of API functions and are used to trace
+ *          application program execution. Unless H5_DEBUG_API has been
+ *          defined they are no-ops.
  *
- * Arguments:  R  - Return type encoded as a string
- *    T  - Argument types encoded as a string
- *    A0-An  - Arguments.  The number at the end of the macro name
- *        indicates the number of arguments.
+ * Arguments:   R  - Return type encoded as a string
+ *              T  - Argument types encoded as a string
+ *              A0-An  - Arguments.  The number at the end of the macro name
+ *                                   indicates the number of arguments.
  *
- * Programmer:  Robb Matzke
- *
- * Modifications:
  *-------------------------------------------------------------------------
  */
 #ifdef H5_DEBUG_API
-#define H5TRACE_DECL         const char *RTYPE=NULL;                                      \
-                                           double CALLTIME;
-#define H5TRACE0(R,T)         RTYPE=R;                                                     \
-             CALLTIME=H5_trace(NULL,FUNC,T)
-#define H5TRACE1(R,T,A0)       RTYPE=R;                                      \
-             CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0)
-#define H5TRACE2(R,T,A0,A1)       RTYPE=R;                                                     \
-             CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0,#A1,A1)
-#define H5TRACE3(R,T,A0,A1,A2)       RTYPE=R;                                      \
-             CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0,#A1,A1,#A2,A2)
-#define H5TRACE4(R,T,A0,A1,A2,A3)     RTYPE=R;                                                     \
-             CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0,#A1,A1,#A2,A2,#A3,A3)
-#define H5TRACE5(R,T,A0,A1,A2,A3,A4)     RTYPE=R;                                                     \
-             CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0,#A1,A1,#A2,A2,#A3,A3,   \
-                                                             #A4,A4)
-#define H5TRACE6(R,T,A0,A1,A2,A3,A4,A5)     RTYPE=R;                                                     \
-             CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0,#A1,A1,#A2,A2,#A3,A3,   \
-                                                             #A4,A4,#A5,A5)
-#define H5TRACE7(R,T,A0,A1,A2,A3,A4,A5,A6) RTYPE=R;                                                     \
-             CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0,#A1,A1,#A2,A2,#A3,A3,   \
-                                                             #A4,A4,#A5,A5,#A6,A6)
-#define H5TRACE8(R,T,A0,A1,A2,A3,A4,A5,A6,A7) RTYPE=R;                                                  \
-                                           CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0,#A1,A1,#A2,A2,#A3,A3,   \
-                                                             #A4,A4,#A5,A5,#A6,A6,#A7,A7)
-#define H5TRACE9(R,T,A0,A1,A2,A3,A4,A5,A6,A7,A8) RTYPE=R;                                               \
-                                           CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0,#A1,A1,#A2,A2,#A3,A3,   \
-                                                             #A4,A4,#A5,A5,#A6,A6,#A7,A7,#A8,A8)
-#define H5TRACE10(R,T,A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) RTYPE=R;                                           \
-                                           CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0,#A1,A1,#A2,A2,#A3,A3,   \
-                                                             #A4,A4,#A5,A5,#A6,A6,#A7,A7,#A8,A8,#A9,A9)
-#define H5TRACE11(R,T,A0,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10) RTYPE=R;                                       \
-                                           CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0,#A1,A1,#A2,A2,#A3,A3,   \
-                                                             #A4,A4,#A5,A5,#A6,A6,#A7,A7,#A8,A8,#A9,A9, \
-                                                             #A10,A10)
-#define H5TRACE_RETURN(V)       if (RTYPE) {                                                 \
-                H5_trace(&CALLTIME,FUNC,RTYPE,NULL,V);                    \
-                RTYPE=NULL;                                               \
-             }
+
+#define H5TRACE_DECL                                                                                    \
+            const char *RTYPE = NULL;                                                                   \
+            double CALLTIME;
+
+#define H5TRACE0(R,T)                                                                                   \
+            RTYPE=R;                                                                                    \
+            CALLTIME=H5_trace(NULL,FUNC,T)
+#define H5TRACE1(R,T,A0)                                                                                \
+            RTYPE=R;                                                                                    \
+            CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0)
+#define H5TRACE2(R,T,A0,A1)                                                                             \
+            RTYPE=R;                                                                                    \
+            CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0,#A1,A1)
+#define H5TRACE3(R,T,A0,A1,A2)                                                                          \
+            RTYPE=R;                                                                                    \
+            CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0,#A1,A1,#A2,A2)
+#define H5TRACE4(R,T,A0,A1,A2,A3)                                                                       \
+            RTYPE=R;                                                                                    \
+            CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0,#A1,A1,#A2,A2,#A3,A3)
+#define H5TRACE5(R,T,A0,A1,A2,A3,A4)                                                                    \
+            RTYPE=R;                                                                                    \
+            CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0,#A1,A1,#A2,A2,#A3,A3,#A4,A4)
+#define H5TRACE6(R,T,A0,A1,A2,A3,A4,A5)                                                                 \
+            RTYPE=R;                                                                                    \
+            CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0,#A1,A1,#A2,A2,#A3,A3,#A4,A4,#A5,A5)
+#define H5TRACE7(R,T,A0,A1,A2,A3,A4,A5,A6)                                                              \
+            RTYPE=R;                                                                                    \
+            CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0,#A1,A1,#A2,A2,#A3,A3,#A4,A4,#A5,A5,#A6,A6)
+#define H5TRACE8(R,T,A0,A1,A2,A3,A4,A5,A6,A7)                                                           \
+            RTYPE=R;                                                                                    \
+            CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0,#A1,A1,#A2,A2,#A3,A3,#A4,A4,#A5,A5,#A6,A6,#A7,A7)
+#define H5TRACE9(R,T,A0,A1,A2,A3,A4,A5,A6,A7,A8)                                                        \
+            RTYPE=R;                                                                                    \
+            CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0,#A1,A1,#A2,A2,#A3,A3,#A4,A4,#A5,A5,#A6,A6,#A7,A7,      \
+                                          #A8,A8)
+#define H5TRACE10(R,T,A0,A1,A2,A3,A4,A5,A6,A7,A8,A9)                                                    \
+            RTYPE=R;                                                                                    \
+            CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0,#A1,A1,#A2,A2,#A3,A3,#A4,A4,#A5,A5,#A6,A6,#A7,A7,      \
+                                          #A8,A8,#A9,A9)
+#define H5TRACE11(R,T,A0,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10)                                                \
+            RTYPE=R;                                                                                    \
+            CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0,#A1,A1,#A2,A2,#A3,A3,#A4,A4,#A5,A5,#A6,A6,#A7,A7,      \
+                                          #A8,A8,#A9,A9,#A10,A10)
+#define H5TRACE12(R,T,A0,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11)                                            \
+            RTYPE=R;                                                                                    \
+            CALLTIME=H5_trace(NULL,FUNC,T,#A0,A0,#A1,A1,#A2,A2,#A3,A3,#A4,A4,#A5,A5,#A6,A6,#A7,A7,      \
+                                          #A8,A8,#A9,A9,#A10,A10,#A11,A11)
+
+#define H5TRACE_RETURN(V)                                                                               \
+            if (RTYPE) {                                                                                \
+                H5_trace(&CALLTIME, FUNC, RTYPE, NULL, V);                                              \
+                RTYPE = NULL;                                                                           \
+            }
 #else
-#define H5TRACE_DECL                      /*void*/
-#define H5TRACE0(R,T)                      /*void*/
-#define H5TRACE1(R,T,A0)                    /*void*/
-#define H5TRACE2(R,T,A0,A1)                    /*void*/
-#define H5TRACE3(R,T,A0,A1,A2)                    /*void*/
-#define H5TRACE4(R,T,A0,A1,A2,A3)                  /*void*/
-#define H5TRACE5(R,T,A0,A1,A2,A3,A4)                  /*void*/
-#define H5TRACE6(R,T,A0,A1,A2,A3,A4,A5)                  /*void*/
-#define H5TRACE7(R,T,A0,A1,A2,A3,A4,A5,A6)              /*void*/
-#define H5TRACE8(R,T,A0,A1,A2,A3,A4,A5,A6,A7)           /*void*/
-#define H5TRACE9(R,T,A0,A1,A2,A3,A4,A5,A6,A7,A8)        /*void*/
-#define H5TRACE10(R,T,A0,A1,A2,A3,A4,A5,A6,A7,A8,A9)    /*void*/
-#define H5TRACE11(R,T,A0,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10) /*void*/
-#define H5TRACE_RETURN(V)                    /*void*/
-#endif
+#define H5TRACE_DECL                                            /*void*/
+#define H5TRACE0(R,T)                                           /*void*/
+#define H5TRACE1(R,T,A0)                                        /*void*/
+#define H5TRACE2(R,T,A0,A1)                                     /*void*/
+#define H5TRACE3(R,T,A0,A1,A2)                                  /*void*/
+#define H5TRACE4(R,T,A0,A1,A2,A3)                               /*void*/
+#define H5TRACE5(R,T,A0,A1,A2,A3,A4)                            /*void*/
+#define H5TRACE6(R,T,A0,A1,A2,A3,A4,A5)                         /*void*/
+#define H5TRACE7(R,T,A0,A1,A2,A3,A4,A5,A6)                      /*void*/
+#define H5TRACE8(R,T,A0,A1,A2,A3,A4,A5,A6,A7)                   /*void*/
+#define H5TRACE9(R,T,A0,A1,A2,A3,A4,A5,A6,A7,A8)                /*void*/
+#define H5TRACE10(R,T,A0,A1,A2,A3,A4,A5,A6,A7,A8,A9)            /*void*/
+#define H5TRACE11(R,T,A0,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10)        /*void*/
+#define H5TRACE12(R,T,A0,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11)    /*void*/
+#define H5TRACE_RETURN(V)                                       /*void*/
+#endif /* H5_DEBUG_API */
 
 H5_DLL double H5_trace(const double *calltime, const char *func, const char *type, ...);
 
@@ -1934,7 +1995,7 @@ extern hbool_t H5_MPEinit_g;   /* Has the MPE Library been initialized? */
                                                                               \
         if(!func_check) {                                                     \
             /* Check function naming status */                                \
-            HDassert(asrt);                                                   \
+            HDassert(asrt && "Function naming conventions are incorrect - check H5_IS_API|PUB|PRIV|PKG macros in H5private.h (this is usually due to an incorrect number of underscores)");                                                   \
                                                                               \
             /* Don't check again */                                           \
             func_check = TRUE;                                                \
@@ -2562,6 +2623,8 @@ H5_DLL uint32_t H5_hash_string(const char *str);
 
 /* Time related routines */
 H5_DLL time_t H5_make_time(struct tm *tm);
+H5_DLL void H5_nanosleep(uint64_t nanosec);
+H5_DLL double H5_get_time(void);
 
 /* Functions for building paths, etc. */
 H5_DLL herr_t   H5_build_extpath(const char *name, char **extpath /*out*/);
