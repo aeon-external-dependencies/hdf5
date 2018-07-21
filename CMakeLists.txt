@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 3.10)
 PROJECT (HDF5 C CXX)
 
 if (MSVC)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4005 /wd4013 /wd4018 /wd4028 /wd4047 /wd4090 /wd4101 /wd4102 /wd4244 /wd4267 /wd4311 /wd4334")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4005 /wd4013 /wd4018 /wd4028 /wd4047 /wd4057 /wd4068 /wd4090 /wd4101 /wd4102 /wd4113 /wd4127 /wd4189 /wd4204 /wd4244 /wd4267 /wd4311 /wd4334 /wd4701 /wd4702 /wd4703 /wd4706")
 endif ()
 
 #-----------------------------------------------------------------------------
